@@ -142,6 +142,133 @@ func (v *RequestValidator) ValidateSubscribeRequest(request *eventstore.CatchUpS
 	return nil
 }
 
+// ValidateCreateUserRequest validates a CreateUserRequest
+func (v *RequestValidator) ValidateCreateUserRequest(request *eventstore.CreateUserRequest) error {
+	if request == nil {
+		return NewOrisunException("CreateUserRequest cannot be nil").
+			AddContext("operation", "createUser")
+	}
+
+	// Validate name
+	if strings.TrimSpace(request.Name) == "" {
+		return NewOrisunException("Name is required").
+			AddContext("operation", "createUser")
+	}
+
+	// Validate username
+	if strings.TrimSpace(request.Username) == "" {
+		return NewOrisunException("Username is required").
+			AddContext("operation", "createUser")
+	}
+
+	// Validate password
+	if strings.TrimSpace(request.Password) == "" {
+		return NewOrisunException("Password is required").
+			AddContext("operation", "createUser")
+	}
+
+	return nil
+}
+
+// ValidateDeleteUserRequest validates a DeleteUserRequest
+func (v *RequestValidator) ValidateDeleteUserRequest(request *eventstore.DeleteUserRequest) error {
+	if request == nil {
+		return NewOrisunException("DeleteUserRequest cannot be nil").
+			AddContext("operation", "deleteUser")
+	}
+
+	// Validate user_id
+	if strings.TrimSpace(request.UserId) == "" {
+		return NewOrisunException("User ID is required").
+			AddContext("operation", "deleteUser")
+	}
+
+	return nil
+}
+
+// ValidateChangePasswordRequest validates a ChangePasswordRequest
+func (v *RequestValidator) ValidateChangePasswordRequest(request *eventstore.ChangePasswordRequest) error {
+	if request == nil {
+		return NewOrisunException("ChangePasswordRequest cannot be nil").
+			AddContext("operation", "changePassword")
+	}
+
+	// Validate user_id
+	if strings.TrimSpace(request.UserId) == "" {
+		return NewOrisunException("User ID is required").
+			AddContext("operation", "changePassword")
+	}
+
+	// Validate current_password
+	if strings.TrimSpace(request.CurrentPassword) == "" {
+		return NewOrisunException("Current password is required").
+			AddContext("operation", "changePassword")
+	}
+
+	// Validate new_password
+	if strings.TrimSpace(request.NewPassword) == "" {
+		return NewOrisunException("New password is required").
+			AddContext("operation", "changePassword")
+	}
+
+	return nil
+}
+
+// ValidateListUsersRequest validates a ListUsersRequest
+func (v *RequestValidator) ValidateListUsersRequest(request *eventstore.ListUsersRequest) error {
+	if request == nil {
+		return NewOrisunException("ListUsersRequest cannot be nil").
+			AddContext("operation", "listUsers")
+	}
+
+	// ListUsersRequest has no required fields
+	return nil
+}
+
+// ValidateValidateCredentialsRequest validates a ValidateCredentialsRequest
+func (v *RequestValidator) ValidateValidateCredentialsRequest(request *eventstore.ValidateCredentialsRequest) error {
+	if request == nil {
+		return NewOrisunException("ValidateCredentialsRequest cannot be nil").
+			AddContext("operation", "validateCredentials")
+	}
+
+	// Validate username
+	if strings.TrimSpace(request.Username) == "" {
+		return NewOrisunException("Username is required").
+			AddContext("operation", "validateCredentials")
+	}
+
+	// Validate password
+	if strings.TrimSpace(request.Password) == "" {
+		return NewOrisunException("Password is required").
+			AddContext("operation", "validateCredentials")
+	}
+
+	return nil
+}
+
+// ValidateGetUserCountRequest validates a GetUserCountRequest
+func (v *RequestValidator) ValidateGetUserCountRequest(request *eventstore.GetUserCountRequest) error {
+	if request == nil {
+		return NewOrisunException("GetUserCountRequest cannot be nil").
+			AddContext("operation", "getUserCount")
+	}
+
+	// GetUserCountRequest has no required fields
+	return nil
+}
+
+// ValidateGetEventCountRequest validates a GetEventCountRequest
+func (v *RequestValidator) ValidateGetEventCountRequest(request *eventstore.GetEventCountRequest) error {
+	if request == nil {
+		return NewOrisunException("GetEventCountRequest cannot be nil").
+			AddContext("operation", "getEventCount")
+	}
+
+	// GetEventCountRequest has no required fields
+	return nil
+}
+
 // ExtractVersionNumbers extracts expected and actual version numbers from an error message
 func ExtractVersionNumbers(errorMsg string) (expected, actual int64, err error) {
 	// Define the regex pattern to match "Expected X, Actual Y"
