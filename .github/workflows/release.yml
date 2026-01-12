@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          check-latest: true
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests
+        run: go test -v ./... -tags=!integration
+
+  create-release:
+    name: Create GitHub Release
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREVIOUS_TAG=$(git tag -l "v*" --sort=-v:refname | sed -n '2p')
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "changelog=Initial release of the Go client" >> $GITHUB_OUTPUT
+          else
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            git log --pretty=format:"* %s (%h)" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Go Client v${{ needs.validate.outputs.version }}
+          tag_name: v${{ needs.validate.outputs.version }}
+          body: |
+            ## Orisun Go Client v${{ needs.validate.outputs.version }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            ```bash
+            go get github.com/oexza/orisun-client-go@v${{ needs.validate.outputs.version }}
+            ```
+
+            ## Usage
+
+            See the [README](https://github.com/oexza/orisun-client-go) for detailed usage instructions.
+
+            Quick start:
+
+            ```go
+            package main
+
+            import (
+                "context"
+                "github.com/oexza/orisun-client-go/orisun"
+            )
+
+            func main() {
+                client, err := orisun.NewClientBuilder().
+                    WithHost("localhost").
+                    WithPort(5005).
+                    WithBasicAuth("admin", "changeit").
+                    Build(context.Background())
+                if err != nil {
+                    panic(err)
+                }
+                defer client.Close()
+
+                // Use the client...
+            }
+            ```
+          draft: false
+          prerelease: false
