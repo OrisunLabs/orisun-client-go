@@ -682,3 +682,302 @@ func (m *mockEventStream) Recv() interface{} {
 	m.eventIndex++
 	return event
 }
+
+// Test CreateUser validation
+func TestClient_CreateUser_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.CreateUser(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "CreateUserRequest cannot be nil")
+
+	// Test with missing name
+	request := &eventstore.CreateUserRequest{
+		Username: "testuser",
+		Password: "password123",
+	}
+	_, err = client.CreateUser(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Name is required")
+
+	// Test with missing username
+	request = &eventstore.CreateUserRequest{
+		Name:     "Test User",
+		Password: "password123",
+	}
+	_, err = client.CreateUser(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Username is required")
+
+	// Test with missing password
+	request = &eventstore.CreateUserRequest{
+		Name:     "Test User",
+		Username: "testuser",
+	}
+	_, err = client.CreateUser(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Password is required")
+}
+
+// Test DeleteUser validation
+func TestClient_DeleteUser_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.DeleteUser(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "DeleteUserRequest cannot be nil")
+
+	// Test with missing user_id
+	request := &eventstore.DeleteUserRequest{}
+	_, err = client.DeleteUser(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "User ID is required")
+}
+
+// Test ChangePassword validation
+func TestClient_ChangePassword_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.ChangePassword(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "ChangePasswordRequest cannot be nil")
+
+	// Test with missing user_id
+	request := &eventstore.ChangePasswordRequest{
+		CurrentPassword: "oldpass",
+		NewPassword:     "newpass",
+	}
+	_, err = client.ChangePassword(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "User ID is required")
+
+	// Test with missing current password
+	request = &eventstore.ChangePasswordRequest{
+		UserId:      "user123",
+		NewPassword: "newpass",
+	}
+	_, err = client.ChangePassword(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Current password is required")
+
+	// Test with missing new password
+	request = &eventstore.ChangePasswordRequest{
+		UserId:          "user123",
+		CurrentPassword: "oldpass",
+	}
+	_, err = client.ChangePassword(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "New password is required")
+}
+
+// Test ListUsers validation
+func TestClient_ListUsers_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.ListUsers(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "ListUsersRequest cannot be nil")
+
+	// Test with valid request (should fail connection but validation passes)
+	request := &eventstore.ListUsersRequest{}
+	_, err = client.ListUsers(context.Background(), request)
+	// Will fail without actual server but validation should pass
+	assert.Error(t, err)
+}
+
+// Test ValidateCredentials validation
+func TestClient_ValidateCredentials_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.ValidateCredentials(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "ValidateCredentialsRequest cannot be nil")
+
+	// Test with missing username
+	request := &eventstore.ValidateCredentialsRequest{
+		Password: "password123",
+	}
+	_, err = client.ValidateCredentials(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Username is required")
+
+	// Test with missing password
+	request = &eventstore.ValidateCredentialsRequest{
+		Username: "testuser",
+	}
+	_, err = client.ValidateCredentials(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Password is required")
+}
+
+// Test GetUserCount validation
+func TestClient_GetUserCount_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.GetUserCount(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "GetUserCountRequest cannot be nil")
+
+	// Test with valid request (should fail connection but validation passes)
+	request := &eventstore.GetUserCountRequest{}
+	_, err = client.GetUserCount(context.Background(), request)
+	// Will fail without actual server but validation should pass
+	assert.Error(t, err)
+}
+
+// Test GetEventCount validation
+func TestClient_GetEventCount_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	// Test with nil request
+	_, err = client.GetEventCount(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "GetEventCountRequest cannot be nil")
+
+	// Test with valid request (should fail connection but validation passes)
+	request := &eventstore.GetEventCountRequest{}
+	_, err = client.GetEventCount(context.Background(), request)
+	// Will fail without actual server but validation should pass
+	assert.Error(t, err)
+}
+
+// Test admin request validators directly
+func TestRequestValidator_AdminRequests(t *testing.T) {
+	validator := NewRequestValidator()
+
+	// Test CreateUserRequest validation
+	t.Run("CreateUserRequest", func(t *testing.T) {
+		err := validator.ValidateCreateUserRequest(nil)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "cannot be nil")
+
+		err = validator.ValidateCreateUserRequest(&eventstore.CreateUserRequest{
+			Username: "test",
+			Password: "pass",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Name is required")
+
+		err = validator.ValidateCreateUserRequest(&eventstore.CreateUserRequest{
+			Name:     "Test",
+			Password: "pass",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Username is required")
+
+		err = validator.ValidateCreateUserRequest(&eventstore.CreateUserRequest{
+			Name:     "Test",
+			Username: "test",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Password is required")
+
+		err = validator.ValidateCreateUserRequest(&eventstore.CreateUserRequest{
+			Name:     "Test",
+			Username: "test",
+			Password: "pass",
+		})
+		assert.NoError(t, err)
+	})
+
+	// Test DeleteUserRequest validation
+	t.Run("DeleteUserRequest", func(t *testing.T) {
+		err := validator.ValidateDeleteUserRequest(nil)
+		assert.Error(t, err)
+
+		err = validator.ValidateDeleteUserRequest(&eventstore.DeleteUserRequest{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "User ID is required")
+
+		err = validator.ValidateDeleteUserRequest(&eventstore.DeleteUserRequest{
+			UserId: "user123",
+		})
+		assert.NoError(t, err)
+	})
+
+	// Test ChangePasswordRequest validation
+	t.Run("ChangePasswordRequest", func(t *testing.T) {
+		err := validator.ValidateChangePasswordRequest(nil)
+		assert.Error(t, err)
+
+		err = validator.ValidateChangePasswordRequest(&eventstore.ChangePasswordRequest{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "User ID is required")
+
+		err = validator.ValidateChangePasswordRequest(&eventstore.ChangePasswordRequest{
+			UserId: "user123",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Current password is required")
+
+		err = validator.ValidateChangePasswordRequest(&eventstore.ChangePasswordRequest{
+			UserId:          "user123",
+			CurrentPassword: "oldpass",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "New password is required")
+
+		err = validator.ValidateChangePasswordRequest(&eventstore.ChangePasswordRequest{
+			UserId:          "user123",
+			CurrentPassword: "oldpass",
+			NewPassword:     "newpass",
+		})
+		assert.NoError(t, err)
+	})
+
+	// Test ValidateCredentialsRequest validation
+	t.Run("ValidateCredentialsRequest", func(t *testing.T) {
+		err := validator.ValidateValidateCredentialsRequest(nil)
+		assert.Error(t, err)
+
+		err = validator.ValidateValidateCredentialsRequest(&eventstore.ValidateCredentialsRequest{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Username is required")
+
+		err = validator.ValidateValidateCredentialsRequest(&eventstore.ValidateCredentialsRequest{
+			Username: "testuser",
+		})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Password is required")
+
+		err = validator.ValidateValidateCredentialsRequest(&eventstore.ValidateCredentialsRequest{
+			Username: "testuser",
+			Password: "pass",
+		})
+		assert.NoError(t, err)
+	})
+}

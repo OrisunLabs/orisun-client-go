@@ -21,6 +21,7 @@ import (
 type OrisunClient struct {
 	conn           *grpc.ClientConn
 	client         eventstore.EventStoreClient
+	adminClient    eventstore.AdminClient
 	defaultTimeout time.Duration
 	logger         Logger
 	tokenCache     *TokenCache
@@ -253,6 +254,7 @@ func (b *ClientBuilder) Build() (*OrisunClient, error) {
 	client := &OrisunClient{
 		conn:           conn,
 		client:         eventstore.NewEventStoreClient(conn),
+		adminClient:    eventstore.NewAdminClient(conn),
 		defaultTimeout: time.Duration(b.timeoutSeconds) * time.Second,
 		logger:         clientLogger,
 		tokenCache:     clientTokenCache,
@@ -570,6 +572,160 @@ func (c *OrisunClient) handleSubscribeException(err error, request any) error {
 
 	return NewOrisunExceptionWithCause("Failed to create subscription", err).
 		AddContext("operation", "subscribe").
+		AddContext("statusCode", st.Code().String()).
+		AddContext("statusDescription", st.Message())
+}
+
+// CreateUser creates a new user
+func (c *OrisunClient) CreateUser(ctx context.Context, request *eventstore.CreateUserRequest) (*eventstore.CreateUserResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateCreateUserRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Creating user with username: '{}'", request.Username)
+
+	// Make the gRPC call
+	response, err := c.adminClient.CreateUser(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "createUser")
+	}
+
+	c.logger.Info("Successfully created user with username: '{}'", request.Username)
+	return response, nil
+}
+
+// DeleteUser deletes a user
+func (c *OrisunClient) DeleteUser(ctx context.Context, request *eventstore.DeleteUserRequest) (*eventstore.DeleteUserResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateDeleteUserRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Deleting user with ID: '{}'", request.UserId)
+
+	// Make the gRPC call
+	response, err := c.adminClient.DeleteUser(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "deleteUser")
+	}
+
+	c.logger.Info("Successfully deleted user with ID: '{}'", request.UserId)
+	return response, nil
+}
+
+// ChangePassword changes a user's password
+func (c *OrisunClient) ChangePassword(ctx context.Context, request *eventstore.ChangePasswordRequest) (*eventstore.ChangePasswordResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateChangePasswordRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Changing password for user ID: '{}'", request.UserId)
+
+	// Make the gRPC call
+	response, err := c.adminClient.ChangePassword(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "changePassword")
+	}
+
+	c.logger.Info("Successfully changed password for user ID: '{}'", request.UserId)
+	return response, nil
+}
+
+// ListUsers lists all users
+func (c *OrisunClient) ListUsers(ctx context.Context, request *eventstore.ListUsersRequest) (*eventstore.ListUsersResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateListUsersRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Listing users")
+
+	// Make the gRPC call
+	response, err := c.adminClient.ListUsers(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "listUsers")
+	}
+
+	c.logger.Debug("Successfully retrieved {} users", len(response.Users))
+	return response, nil
+}
+
+// ValidateCredentials validates user credentials
+func (c *OrisunClient) ValidateCredentials(ctx context.Context, request *eventstore.ValidateCredentialsRequest) (*eventstore.ValidateCredentialsResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateValidateCredentialsRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Validating credentials for username: '{}'", request.Username)
+
+	// Make the gRPC call
+	response, err := c.adminClient.ValidateCredentials(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "validateCredentials")
+	}
+
+	c.logger.Debug("Successfully validated credentials for username: '{}'", request.Username)
+	return response, nil
+}
+
+// GetUserCount gets the total number of users
+func (c *OrisunClient) GetUserCount(ctx context.Context, request *eventstore.GetUserCountRequest) (*eventstore.GetUserCountResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateGetUserCountRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Getting user count")
+
+	// Make the gRPC call
+	response, err := c.adminClient.GetUserCount(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "getUserCount")
+	}
+
+	c.logger.Debug("Successfully retrieved user count: {}", response.Count)
+	return response, nil
+}
+
+// GetEventCount gets the total number of events
+func (c *OrisunClient) GetEventCount(ctx context.Context, request *eventstore.GetEventCountRequest) (*eventstore.GetEventCountResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateGetEventCountRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Getting event count")
+
+	// Make the gRPC call
+	response, err := c.adminClient.GetEventCount(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "getEventCount")
+	}
+
+	c.logger.Debug("Successfully retrieved event count: {}", response.Count)
+	return response, nil
+}
+
+// handleAdminException handles exceptions from admin operations
+func (c *OrisunClient) handleAdminException(err error, operation string) error {
+	st, ok := status.FromError(err)
+	if !ok {
+		return NewOrisunExceptionWithCause(fmt.Sprintf("Failed to %s", operation), err).
+			AddContext("operation", operation)
+	}
+
+	return NewOrisunExceptionWithCause(fmt.Sprintf("Failed to %s", operation), err).
+		AddContext("operation", operation).
 		AddContext("statusCode", st.Code().String()).
 		AddContext("statusDescription", st.Message())
 }
