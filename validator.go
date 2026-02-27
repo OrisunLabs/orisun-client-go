@@ -269,6 +269,64 @@ func (v *RequestValidator) ValidateGetEventCountRequest(request *eventstore.GetE
 	return nil
 }
 
+// ValidateCreateIndexRequest validates a CreateIndexRequest
+func (v *RequestValidator) ValidateCreateIndexRequest(request *eventstore.CreateIndexRequest) error {
+	if request == nil {
+		return NewOrisunException("CreateIndexRequest cannot be nil").
+			AddContext("operation", "createIndex")
+	}
+
+	// Validate boundary
+	if strings.TrimSpace(request.Boundary) == "" {
+		return NewOrisunException("Boundary is required").
+			AddContext("operation", "createIndex")
+	}
+
+	// Validate name
+	if strings.TrimSpace(request.Name) == "" {
+		return NewOrisunException("Index name is required").
+			AddContext("operation", "createIndex")
+	}
+
+	// Validate fields
+	if len(request.Fields) == 0 {
+		return NewOrisunException("At least one field is required").
+			AddContext("operation", "createIndex")
+	}
+
+	// Validate each field
+	for i, field := range request.Fields {
+		if strings.TrimSpace(field.JsonKey) == "" {
+			return NewOrisunException(fmt.Sprintf("Field at index %d is missing json_key", i)).
+				AddContext("operation", "createIndex")
+		}
+	}
+
+	return nil
+}
+
+// ValidateDropIndexRequest validates a DropIndexRequest
+func (v *RequestValidator) ValidateDropIndexRequest(request *eventstore.DropIndexRequest) error {
+	if request == nil {
+		return NewOrisunException("DropIndexRequest cannot be nil").
+			AddContext("operation", "dropIndex")
+	}
+
+	// Validate boundary
+	if strings.TrimSpace(request.Boundary) == "" {
+		return NewOrisunException("Boundary is required").
+			AddContext("operation", "dropIndex")
+	}
+
+	// Validate name
+	if strings.TrimSpace(request.Name) == "" {
+		return NewOrisunException("Index name is required").
+			AddContext("operation", "dropIndex")
+	}
+
+	return nil
+}
+
 // ExtractVersionNumbers extracts expected and actual version numbers from an error message
 func ExtractVersionNumbers(errorMsg string) (expected, actual int64, err error) {
 	// Define the regex pattern to match "Expected X, Actual Y"

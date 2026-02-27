@@ -716,6 +716,46 @@ func (c *OrisunClient) GetEventCount(ctx context.Context, request *eventstore.Ge
 	return response, nil
 }
 
+// CreateIndex creates an index on a boundary
+func (c *OrisunClient) CreateIndex(ctx context.Context, request *eventstore.CreateIndexRequest) (*eventstore.CreateIndexResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateCreateIndexRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Creating index '{}' on boundary '{}'", request.Name, request.Boundary)
+
+	// Make the gRPC call
+	response, err := c.adminClient.CreateIndex(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "createIndex")
+	}
+
+	c.logger.Info("Successfully created index '{}' on boundary '{}'", request.Name, request.Boundary)
+	return response, nil
+}
+
+// DropIndex drops an index from a boundary
+func (c *OrisunClient) DropIndex(ctx context.Context, request *eventstore.DropIndexRequest) (*eventstore.DropIndexResponse, error) {
+	// Validate request
+	validator := NewRequestValidator()
+	if err := validator.ValidateDropIndexRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Dropping index '{}' from boundary '{}'", request.Name, request.Boundary)
+
+	// Make the gRPC call
+	response, err := c.adminClient.DropIndex(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "dropIndex")
+	}
+
+	c.logger.Info("Successfully dropped index '{}' from boundary '{}'", request.Name, request.Boundary)
+	return response, nil
+}
+
 // handleAdminException handles exceptions from admin operations
 func (c *OrisunClient) handleAdminException(err error, operation string) error {
 	st, ok := status.FromError(err)
