@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.7
 // 	protoc        v6.32.0
-// source: protos/admin.proto
+// source: admin.proto
 
 package orisun
 
@@ -22,104 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ValueType int32
-
-const (
-	ValueType_TEXT        ValueType = 0
-	ValueType_NUMERIC     ValueType = 1
-	ValueType_BOOLEAN     ValueType = 2
-	ValueType_TIMESTAMPTZ ValueType = 3
-)
-
-// Enum value maps for ValueType.
-var (
-	ValueType_name = map[int32]string{
-		0: "TEXT",
-		1: "NUMERIC",
-		2: "BOOLEAN",
-		3: "TIMESTAMPTZ",
-	}
-	ValueType_value = map[string]int32{
-		"TEXT":        0,
-		"NUMERIC":     1,
-		"BOOLEAN":     2,
-		"TIMESTAMPTZ": 3,
-	}
-)
-
-func (x ValueType) Enum() *ValueType {
-	p := new(ValueType)
-	*p = x
-	return p
-}
-
-func (x ValueType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ValueType) Descriptor() protoreflect.EnumDescriptor {
-	return file_protos_admin_proto_enumTypes[0].Descriptor()
-}
-
-func (ValueType) Type() protoreflect.EnumType {
-	return &file_protos_admin_proto_enumTypes[0]
-}
-
-func (x ValueType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ValueType.Descriptor instead.
-func (ValueType) EnumDescriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{0}
-}
-
-type ConditionCombinator int32
-
-const (
-	ConditionCombinator_AND ConditionCombinator = 0
-	ConditionCombinator_OR  ConditionCombinator = 1
-)
-
-// Enum value maps for ConditionCombinator.
-var (
-	ConditionCombinator_name = map[int32]string{
-		0: "AND",
-		1: "OR",
-	}
-	ConditionCombinator_value = map[string]int32{
-		"AND": 0,
-		"OR":  1,
-	}
-)
-
-func (x ConditionCombinator) Enum() *ConditionCombinator {
-	p := new(ConditionCombinator)
-	*p = x
-	return p
-}
-
-func (x ConditionCombinator) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ConditionCombinator) Descriptor() protoreflect.EnumDescriptor {
-	return file_protos_admin_proto_enumTypes[1].Descriptor()
-}
-
-func (ConditionCombinator) Type() protoreflect.EnumType {
-	return &file_protos_admin_proto_enumTypes[1]
-}
-
-func (x ConditionCombinator) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ConditionCombinator.Descriptor instead.
-func (ConditionCombinator) EnumDescriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{1}
-}
-
 // AdminUser represents a user in the system
 type AdminUser struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -135,7 +37,7 @@ type AdminUser struct {
 
 func (x *AdminUser) Reset() {
 	*x = AdminUser{}
-	mi := &file_protos_admin_proto_msgTypes[0]
+	mi := &file_admin_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -147,7 +49,7 @@ func (x *AdminUser) String() string {
 func (*AdminUser) ProtoMessage() {}
 
 func (x *AdminUser) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[0]
+	mi := &file_admin_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -160,7 +62,7 @@ func (x *AdminUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminUser.ProtoReflect.Descriptor instead.
 func (*AdminUser) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{0}
+	return file_admin_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AdminUser) GetUserId() string {
@@ -218,7 +120,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_protos_admin_proto_msgTypes[1]
+	mi := &file_admin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -230,7 +132,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[1]
+	mi := &file_admin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -243,7 +145,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{1}
+	return file_admin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateUserRequest) GetName() string {
@@ -284,7 +186,7 @@ type CreateUserResponse struct {
 
 func (x *CreateUserResponse) Reset() {
 	*x = CreateUserResponse{}
-	mi := &file_protos_admin_proto_msgTypes[2]
+	mi := &file_admin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -296,7 +198,7 @@ func (x *CreateUserResponse) String() string {
 func (*CreateUserResponse) ProtoMessage() {}
 
 func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[2]
+	mi := &file_admin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -309,7 +211,7 @@ func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
 func (*CreateUserResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{2}
+	return file_admin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateUserResponse) GetUser() *AdminUser {
@@ -329,7 +231,7 @@ type DeleteUserRequest struct {
 
 func (x *DeleteUserRequest) Reset() {
 	*x = DeleteUserRequest{}
-	mi := &file_protos_admin_proto_msgTypes[3]
+	mi := &file_admin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +243,7 @@ func (x *DeleteUserRequest) String() string {
 func (*DeleteUserRequest) ProtoMessage() {}
 
 func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[3]
+	mi := &file_admin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +256,7 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{3}
+	return file_admin_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteUserRequest) GetUserId() string {
@@ -374,7 +276,7 @@ type DeleteUserResponse struct {
 
 func (x *DeleteUserResponse) Reset() {
 	*x = DeleteUserResponse{}
-	mi := &file_protos_admin_proto_msgTypes[4]
+	mi := &file_admin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -386,7 +288,7 @@ func (x *DeleteUserResponse) String() string {
 func (*DeleteUserResponse) ProtoMessage() {}
 
 func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[4]
+	mi := &file_admin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -399,7 +301,7 @@ func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
 func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{4}
+	return file_admin_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeleteUserResponse) GetSuccess() bool {
@@ -421,7 +323,7 @@ type ChangePasswordRequest struct {
 
 func (x *ChangePasswordRequest) Reset() {
 	*x = ChangePasswordRequest{}
-	mi := &file_protos_admin_proto_msgTypes[5]
+	mi := &file_admin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -433,7 +335,7 @@ func (x *ChangePasswordRequest) String() string {
 func (*ChangePasswordRequest) ProtoMessage() {}
 
 func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[5]
+	mi := &file_admin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -446,7 +348,7 @@ func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
 func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{5}
+	return file_admin_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ChangePasswordRequest) GetUserId() string {
@@ -480,7 +382,7 @@ type ChangePasswordResponse struct {
 
 func (x *ChangePasswordResponse) Reset() {
 	*x = ChangePasswordResponse{}
-	mi := &file_protos_admin_proto_msgTypes[6]
+	mi := &file_admin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -492,7 +394,7 @@ func (x *ChangePasswordResponse) String() string {
 func (*ChangePasswordResponse) ProtoMessage() {}
 
 func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[6]
+	mi := &file_admin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -505,7 +407,7 @@ func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangePasswordResponse.ProtoReflect.Descriptor instead.
 func (*ChangePasswordResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{6}
+	return file_admin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ChangePasswordResponse) GetSuccess() bool {
@@ -524,7 +426,7 @@ type ListUsersRequest struct {
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_protos_admin_proto_msgTypes[7]
+	mi := &file_admin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -536,7 +438,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[7]
+	mi := &file_admin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -549,7 +451,7 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{7}
+	return file_admin_proto_rawDescGZIP(), []int{7}
 }
 
 // ListUsersResponse returns list of users
@@ -562,7 +464,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_protos_admin_proto_msgTypes[8]
+	mi := &file_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -574,7 +476,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[8]
+	mi := &file_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,7 +489,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{8}
+	return file_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListUsersResponse) GetUsers() []*AdminUser {
@@ -608,7 +510,7 @@ type ValidateCredentialsRequest struct {
 
 func (x *ValidateCredentialsRequest) Reset() {
 	*x = ValidateCredentialsRequest{}
-	mi := &file_protos_admin_proto_msgTypes[9]
+	mi := &file_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -620,7 +522,7 @@ func (x *ValidateCredentialsRequest) String() string {
 func (*ValidateCredentialsRequest) ProtoMessage() {}
 
 func (x *ValidateCredentialsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[9]
+	mi := &file_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -633,7 +535,7 @@ func (x *ValidateCredentialsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateCredentialsRequest.ProtoReflect.Descriptor instead.
 func (*ValidateCredentialsRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{9}
+	return file_admin_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ValidateCredentialsRequest) GetUsername() string {
@@ -661,7 +563,7 @@ type ValidateCredentialsResponse struct {
 
 func (x *ValidateCredentialsResponse) Reset() {
 	*x = ValidateCredentialsResponse{}
-	mi := &file_protos_admin_proto_msgTypes[10]
+	mi := &file_admin_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -673,7 +575,7 @@ func (x *ValidateCredentialsResponse) String() string {
 func (*ValidateCredentialsResponse) ProtoMessage() {}
 
 func (x *ValidateCredentialsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[10]
+	mi := &file_admin_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +588,7 @@ func (x *ValidateCredentialsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateCredentialsResponse.ProtoReflect.Descriptor instead.
 func (*ValidateCredentialsResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{10}
+	return file_admin_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ValidateCredentialsResponse) GetSuccess() bool {
@@ -712,7 +614,7 @@ type GetUserCountRequest struct {
 
 func (x *GetUserCountRequest) Reset() {
 	*x = GetUserCountRequest{}
-	mi := &file_protos_admin_proto_msgTypes[11]
+	mi := &file_admin_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -724,7 +626,7 @@ func (x *GetUserCountRequest) String() string {
 func (*GetUserCountRequest) ProtoMessage() {}
 
 func (x *GetUserCountRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[11]
+	mi := &file_admin_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -737,7 +639,7 @@ func (x *GetUserCountRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserCountRequest.ProtoReflect.Descriptor instead.
 func (*GetUserCountRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{11}
+	return file_admin_proto_rawDescGZIP(), []int{11}
 }
 
 // GetUserCountResponse returns user count
@@ -750,7 +652,7 @@ type GetUserCountResponse struct {
 
 func (x *GetUserCountResponse) Reset() {
 	*x = GetUserCountResponse{}
-	mi := &file_protos_admin_proto_msgTypes[12]
+	mi := &file_admin_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -762,7 +664,7 @@ func (x *GetUserCountResponse) String() string {
 func (*GetUserCountResponse) ProtoMessage() {}
 
 func (x *GetUserCountResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[12]
+	mi := &file_admin_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -775,7 +677,7 @@ func (x *GetUserCountResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserCountResponse.ProtoReflect.Descriptor instead.
 func (*GetUserCountResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{12}
+	return file_admin_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetUserCountResponse) GetCount() int64 {
@@ -795,7 +697,7 @@ type GetEventCountRequest struct {
 
 func (x *GetEventCountRequest) Reset() {
 	*x = GetEventCountRequest{}
-	mi := &file_protos_admin_proto_msgTypes[13]
+	mi := &file_admin_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -807,7 +709,7 @@ func (x *GetEventCountRequest) String() string {
 func (*GetEventCountRequest) ProtoMessage() {}
 
 func (x *GetEventCountRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[13]
+	mi := &file_admin_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -820,7 +722,7 @@ func (x *GetEventCountRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEventCountRequest.ProtoReflect.Descriptor instead.
 func (*GetEventCountRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{13}
+	return file_admin_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetEventCountRequest) GetBoundary() string {
@@ -840,7 +742,7 @@ type GetEventCountResponse struct {
 
 func (x *GetEventCountResponse) Reset() {
 	*x = GetEventCountResponse{}
-	mi := &file_protos_admin_proto_msgTypes[14]
+	mi := &file_admin_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +754,7 @@ func (x *GetEventCountResponse) String() string {
 func (*GetEventCountResponse) ProtoMessage() {}
 
 func (x *GetEventCountResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[14]
+	mi := &file_admin_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +767,7 @@ func (x *GetEventCountResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEventCountResponse.ProtoReflect.Descriptor instead.
 func (*GetEventCountResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{14}
+	return file_admin_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetEventCountResponse) GetCount() int64 {
@@ -875,327 +777,11 @@ func (x *GetEventCountResponse) GetCount() int64 {
 	return 0
 }
 
-// IndexField describes one key to include in the index expression.
-// Multiple fields produce a composite index.
-type IndexField struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	JsonKey       string                 `protobuf:"bytes,1,opt,name=json_key,json=jsonKey,proto3" json:"json_key,omitempty"`
-	ValueType     ValueType              `protobuf:"varint,2,opt,name=value_type,json=valueType,proto3,enum=orisun.ValueType" json:"value_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+var File_admin_proto protoreflect.FileDescriptor
 
-func (x *IndexField) Reset() {
-	*x = IndexField{}
-	mi := &file_protos_admin_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *IndexField) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*IndexField) ProtoMessage() {}
-
-func (x *IndexField) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use IndexField.ProtoReflect.Descriptor instead.
-func (*IndexField) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *IndexField) GetJsonKey() string {
-	if x != nil {
-		return x.JsonKey
-	}
-	return ""
-}
-
-func (x *IndexField) GetValueType() ValueType {
-	if x != nil {
-		return x.ValueType
-	}
-	return ValueType_TEXT
-}
-
-// IndexCondition describes one predicate in the partial-index filter.
-// Multiple conditions are combined with condition_combinator.
-type IndexCondition struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Operator      string                 `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty"`
-	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *IndexCondition) Reset() {
-	*x = IndexCondition{}
-	mi := &file_protos_admin_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *IndexCondition) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*IndexCondition) ProtoMessage() {}
-
-func (x *IndexCondition) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use IndexCondition.ProtoReflect.Descriptor instead.
-func (*IndexCondition) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *IndexCondition) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *IndexCondition) GetOperator() string {
-	if x != nil {
-		return x.Operator
-	}
-	return ""
-}
-
-func (x *IndexCondition) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	return ""
-}
-
-type CreateIndexRequest struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Boundary            string                 `protobuf:"bytes,1,opt,name=boundary,proto3" json:"boundary,omitempty"`
-	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Fields              []*IndexField          `protobuf:"bytes,3,rep,name=fields,proto3" json:"fields,omitempty"`
-	Conditions          []*IndexCondition      `protobuf:"bytes,4,rep,name=conditions,proto3" json:"conditions,omitempty"`
-	ConditionCombinator ConditionCombinator    `protobuf:"varint,5,opt,name=condition_combinator,json=conditionCombinator,proto3,enum=orisun.ConditionCombinator" json:"condition_combinator,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *CreateIndexRequest) Reset() {
-	*x = CreateIndexRequest{}
-	mi := &file_protos_admin_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateIndexRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateIndexRequest) ProtoMessage() {}
-
-func (x *CreateIndexRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateIndexRequest.ProtoReflect.Descriptor instead.
-func (*CreateIndexRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *CreateIndexRequest) GetBoundary() string {
-	if x != nil {
-		return x.Boundary
-	}
-	return ""
-}
-
-func (x *CreateIndexRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateIndexRequest) GetFields() []*IndexField {
-	if x != nil {
-		return x.Fields
-	}
-	return nil
-}
-
-func (x *CreateIndexRequest) GetConditions() []*IndexCondition {
-	if x != nil {
-		return x.Conditions
-	}
-	return nil
-}
-
-func (x *CreateIndexRequest) GetConditionCombinator() ConditionCombinator {
-	if x != nil {
-		return x.ConditionCombinator
-	}
-	return ConditionCombinator_AND
-}
-
-type CreateIndexResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateIndexResponse) Reset() {
-	*x = CreateIndexResponse{}
-	mi := &file_protos_admin_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateIndexResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateIndexResponse) ProtoMessage() {}
-
-func (x *CreateIndexResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateIndexResponse.ProtoReflect.Descriptor instead.
-func (*CreateIndexResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{18}
-}
-
-type DropIndexRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Boundary      string                 `protobuf:"bytes,1,opt,name=boundary,proto3" json:"boundary,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DropIndexRequest) Reset() {
-	*x = DropIndexRequest{}
-	mi := &file_protos_admin_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DropIndexRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DropIndexRequest) ProtoMessage() {}
-
-func (x *DropIndexRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DropIndexRequest.ProtoReflect.Descriptor instead.
-func (*DropIndexRequest) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *DropIndexRequest) GetBoundary() string {
-	if x != nil {
-		return x.Boundary
-	}
-	return ""
-}
-
-func (x *DropIndexRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-type DropIndexResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DropIndexResponse) Reset() {
-	*x = DropIndexResponse{}
-	mi := &file_protos_admin_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DropIndexResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DropIndexResponse) ProtoMessage() {}
-
-func (x *DropIndexResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protos_admin_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DropIndexResponse.ProtoReflect.Descriptor instead.
-func (*DropIndexResponse) Descriptor() ([]byte, []int) {
-	return file_protos_admin_proto_rawDescGZIP(), []int{20}
-}
-
-var File_protos_admin_proto protoreflect.FileDescriptor
-
-const file_protos_admin_proto_rawDesc = "" +
+const file_admin_proto_rawDesc = "" +
 	"\n" +
-	"\x12protos/admin.proto\x12\x06orisun\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x01\n" +
+	"\vadmin.proto\x12\x06orisun\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x01\n" +
 	"\tAdminUser\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -1237,37 +823,7 @@ const file_protos_admin_proto_rawDesc = "" +
 	"\x14GetEventCountRequest\x12\x1a\n" +
 	"\bboundary\x18\x01 \x01(\tR\bboundary\"-\n" +
 	"\x15GetEventCountResponse\x12\x14\n" +
-	"\x05count\x18\x01 \x01(\x03R\x05count\"Y\n" +
-	"\n" +
-	"IndexField\x12\x19\n" +
-	"\bjson_key\x18\x01 \x01(\tR\ajsonKey\x120\n" +
-	"\n" +
-	"value_type\x18\x02 \x01(\x0e2\x11.orisun.ValueTypeR\tvalueType\"T\n" +
-	"\x0eIndexCondition\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x1a\n" +
-	"\boperator\x18\x02 \x01(\tR\boperator\x12\x14\n" +
-	"\x05value\x18\x03 \x01(\tR\x05value\"\xf8\x01\n" +
-	"\x12CreateIndexRequest\x12\x1a\n" +
-	"\bboundary\x18\x01 \x01(\tR\bboundary\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12*\n" +
-	"\x06fields\x18\x03 \x03(\v2\x12.orisun.IndexFieldR\x06fields\x126\n" +
-	"\n" +
-	"conditions\x18\x04 \x03(\v2\x16.orisun.IndexConditionR\n" +
-	"conditions\x12N\n" +
-	"\x14condition_combinator\x18\x05 \x01(\x0e2\x1b.orisun.ConditionCombinatorR\x13conditionCombinator\"\x15\n" +
-	"\x13CreateIndexResponse\"B\n" +
-	"\x10DropIndexRequest\x12\x1a\n" +
-	"\bboundary\x18\x01 \x01(\tR\bboundary\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"\x13\n" +
-	"\x11DropIndexResponse*@\n" +
-	"\tValueType\x12\b\n" +
-	"\x04TEXT\x10\x00\x12\v\n" +
-	"\aNUMERIC\x10\x01\x12\v\n" +
-	"\aBOOLEAN\x10\x02\x12\x0f\n" +
-	"\vTIMESTAMPTZ\x10\x03*&\n" +
-	"\x13ConditionCombinator\x12\a\n" +
-	"\x03AND\x10\x00\x12\x06\n" +
-	"\x02OR\x10\x012\xa7\x05\n" +
+	"\x05count\x18\x01 \x01(\x03R\x05count2\x9d\x04\n" +
 	"\x05Admin\x12C\n" +
 	"\n" +
 	"CreateUser\x12\x19.orisun.CreateUserRequest\x1a\x1a.orisun.CreateUserResponse\x12C\n" +
@@ -1277,107 +833,87 @@ const file_protos_admin_proto_rawDesc = "" +
 	"\tListUsers\x12\x18.orisun.ListUsersRequest\x1a\x19.orisun.ListUsersResponse\x12^\n" +
 	"\x13ValidateCredentials\x12\".orisun.ValidateCredentialsRequest\x1a#.orisun.ValidateCredentialsResponse\x12I\n" +
 	"\fGetUserCount\x12\x1b.orisun.GetUserCountRequest\x1a\x1c.orisun.GetUserCountResponse\x12L\n" +
-	"\rGetEventCount\x12\x1c.orisun.GetEventCountRequest\x1a\x1d.orisun.GetEventCountResponse\x12F\n" +
-	"\vCreateIndex\x12\x1a.orisun.CreateIndexRequest\x1a\x1b.orisun.CreateIndexResponse\x12@\n" +
-	"\tDropIndex\x12\x18.orisun.DropIndexRequest\x1a\x19.orisun.DropIndexResponseB2\n" +
+	"\rGetEventCount\x12\x1c.orisun.GetEventCountRequest\x1a\x1d.orisun.GetEventCountResponseB2\n" +
 	"\x10com.orisun.adminZ\x1egithub.com/oexza/Orisun/orisunb\x06proto3"
 
 var (
-	file_protos_admin_proto_rawDescOnce sync.Once
-	file_protos_admin_proto_rawDescData []byte
+	file_admin_proto_rawDescOnce sync.Once
+	file_admin_proto_rawDescData []byte
 )
 
-func file_protos_admin_proto_rawDescGZIP() []byte {
-	file_protos_admin_proto_rawDescOnce.Do(func() {
-		file_protos_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_protos_admin_proto_rawDesc), len(file_protos_admin_proto_rawDesc)))
+func file_admin_proto_rawDescGZIP() []byte {
+	file_admin_proto_rawDescOnce.Do(func() {
+		file_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_proto_rawDesc), len(file_admin_proto_rawDesc)))
 	})
-	return file_protos_admin_proto_rawDescData
+	return file_admin_proto_rawDescData
 }
 
-var file_protos_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_protos_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
-var file_protos_admin_proto_goTypes = []any{
-	(ValueType)(0),                      // 0: orisun.ValueType
-	(ConditionCombinator)(0),            // 1: orisun.ConditionCombinator
-	(*AdminUser)(nil),                   // 2: orisun.AdminUser
-	(*CreateUserRequest)(nil),           // 3: orisun.CreateUserRequest
-	(*CreateUserResponse)(nil),          // 4: orisun.CreateUserResponse
-	(*DeleteUserRequest)(nil),           // 5: orisun.DeleteUserRequest
-	(*DeleteUserResponse)(nil),          // 6: orisun.DeleteUserResponse
-	(*ChangePasswordRequest)(nil),       // 7: orisun.ChangePasswordRequest
-	(*ChangePasswordResponse)(nil),      // 8: orisun.ChangePasswordResponse
-	(*ListUsersRequest)(nil),            // 9: orisun.ListUsersRequest
-	(*ListUsersResponse)(nil),           // 10: orisun.ListUsersResponse
-	(*ValidateCredentialsRequest)(nil),  // 11: orisun.ValidateCredentialsRequest
-	(*ValidateCredentialsResponse)(nil), // 12: orisun.ValidateCredentialsResponse
-	(*GetUserCountRequest)(nil),         // 13: orisun.GetUserCountRequest
-	(*GetUserCountResponse)(nil),        // 14: orisun.GetUserCountResponse
-	(*GetEventCountRequest)(nil),        // 15: orisun.GetEventCountRequest
-	(*GetEventCountResponse)(nil),       // 16: orisun.GetEventCountResponse
-	(*IndexField)(nil),                  // 17: orisun.IndexField
-	(*IndexCondition)(nil),              // 18: orisun.IndexCondition
-	(*CreateIndexRequest)(nil),          // 19: orisun.CreateIndexRequest
-	(*CreateIndexResponse)(nil),         // 20: orisun.CreateIndexResponse
-	(*DropIndexRequest)(nil),            // 21: orisun.DropIndexRequest
-	(*DropIndexResponse)(nil),           // 22: orisun.DropIndexResponse
-	(*timestamppb.Timestamp)(nil),       // 23: google.protobuf.Timestamp
+var file_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_admin_proto_goTypes = []any{
+	(*AdminUser)(nil),                   // 0: orisun.AdminUser
+	(*CreateUserRequest)(nil),           // 1: orisun.CreateUserRequest
+	(*CreateUserResponse)(nil),          // 2: orisun.CreateUserResponse
+	(*DeleteUserRequest)(nil),           // 3: orisun.DeleteUserRequest
+	(*DeleteUserResponse)(nil),          // 4: orisun.DeleteUserResponse
+	(*ChangePasswordRequest)(nil),       // 5: orisun.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),      // 6: orisun.ChangePasswordResponse
+	(*ListUsersRequest)(nil),            // 7: orisun.ListUsersRequest
+	(*ListUsersResponse)(nil),           // 8: orisun.ListUsersResponse
+	(*ValidateCredentialsRequest)(nil),  // 9: orisun.ValidateCredentialsRequest
+	(*ValidateCredentialsResponse)(nil), // 10: orisun.ValidateCredentialsResponse
+	(*GetUserCountRequest)(nil),         // 11: orisun.GetUserCountRequest
+	(*GetUserCountResponse)(nil),        // 12: orisun.GetUserCountResponse
+	(*GetEventCountRequest)(nil),        // 13: orisun.GetEventCountRequest
+	(*GetEventCountResponse)(nil),       // 14: orisun.GetEventCountResponse
+	(*timestamppb.Timestamp)(nil),       // 15: google.protobuf.Timestamp
 }
-var file_protos_admin_proto_depIdxs = []int32{
-	23, // 0: orisun.AdminUser.created_at:type_name -> google.protobuf.Timestamp
-	23, // 1: orisun.AdminUser.updated_at:type_name -> google.protobuf.Timestamp
-	2,  // 2: orisun.CreateUserResponse.user:type_name -> orisun.AdminUser
-	2,  // 3: orisun.ListUsersResponse.users:type_name -> orisun.AdminUser
-	2,  // 4: orisun.ValidateCredentialsResponse.user:type_name -> orisun.AdminUser
-	0,  // 5: orisun.IndexField.value_type:type_name -> orisun.ValueType
-	17, // 6: orisun.CreateIndexRequest.fields:type_name -> orisun.IndexField
-	18, // 7: orisun.CreateIndexRequest.conditions:type_name -> orisun.IndexCondition
-	1,  // 8: orisun.CreateIndexRequest.condition_combinator:type_name -> orisun.ConditionCombinator
-	3,  // 9: orisun.Admin.CreateUser:input_type -> orisun.CreateUserRequest
-	5,  // 10: orisun.Admin.DeleteUser:input_type -> orisun.DeleteUserRequest
-	7,  // 11: orisun.Admin.ChangePassword:input_type -> orisun.ChangePasswordRequest
-	9,  // 12: orisun.Admin.ListUsers:input_type -> orisun.ListUsersRequest
-	11, // 13: orisun.Admin.ValidateCredentials:input_type -> orisun.ValidateCredentialsRequest
-	13, // 14: orisun.Admin.GetUserCount:input_type -> orisun.GetUserCountRequest
-	15, // 15: orisun.Admin.GetEventCount:input_type -> orisun.GetEventCountRequest
-	19, // 16: orisun.Admin.CreateIndex:input_type -> orisun.CreateIndexRequest
-	21, // 17: orisun.Admin.DropIndex:input_type -> orisun.DropIndexRequest
-	4,  // 18: orisun.Admin.CreateUser:output_type -> orisun.CreateUserResponse
-	6,  // 19: orisun.Admin.DeleteUser:output_type -> orisun.DeleteUserResponse
-	8,  // 20: orisun.Admin.ChangePassword:output_type -> orisun.ChangePasswordResponse
-	10, // 21: orisun.Admin.ListUsers:output_type -> orisun.ListUsersResponse
-	12, // 22: orisun.Admin.ValidateCredentials:output_type -> orisun.ValidateCredentialsResponse
-	14, // 23: orisun.Admin.GetUserCount:output_type -> orisun.GetUserCountResponse
-	16, // 24: orisun.Admin.GetEventCount:output_type -> orisun.GetEventCountResponse
-	20, // 25: orisun.Admin.CreateIndex:output_type -> orisun.CreateIndexResponse
-	22, // 26: orisun.Admin.DropIndex:output_type -> orisun.DropIndexResponse
-	18, // [18:27] is the sub-list for method output_type
-	9,  // [9:18] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+var file_admin_proto_depIdxs = []int32{
+	15, // 0: orisun.AdminUser.created_at:type_name -> google.protobuf.Timestamp
+	15, // 1: orisun.AdminUser.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 2: orisun.CreateUserResponse.user:type_name -> orisun.AdminUser
+	0,  // 3: orisun.ListUsersResponse.users:type_name -> orisun.AdminUser
+	0,  // 4: orisun.ValidateCredentialsResponse.user:type_name -> orisun.AdminUser
+	1,  // 5: orisun.Admin.CreateUser:input_type -> orisun.CreateUserRequest
+	3,  // 6: orisun.Admin.DeleteUser:input_type -> orisun.DeleteUserRequest
+	5,  // 7: orisun.Admin.ChangePassword:input_type -> orisun.ChangePasswordRequest
+	7,  // 8: orisun.Admin.ListUsers:input_type -> orisun.ListUsersRequest
+	9,  // 9: orisun.Admin.ValidateCredentials:input_type -> orisun.ValidateCredentialsRequest
+	11, // 10: orisun.Admin.GetUserCount:input_type -> orisun.GetUserCountRequest
+	13, // 11: orisun.Admin.GetEventCount:input_type -> orisun.GetEventCountRequest
+	2,  // 12: orisun.Admin.CreateUser:output_type -> orisun.CreateUserResponse
+	4,  // 13: orisun.Admin.DeleteUser:output_type -> orisun.DeleteUserResponse
+	6,  // 14: orisun.Admin.ChangePassword:output_type -> orisun.ChangePasswordResponse
+	8,  // 15: orisun.Admin.ListUsers:output_type -> orisun.ListUsersResponse
+	10, // 16: orisun.Admin.ValidateCredentials:output_type -> orisun.ValidateCredentialsResponse
+	12, // 17: orisun.Admin.GetUserCount:output_type -> orisun.GetUserCountResponse
+	14, // 18: orisun.Admin.GetEventCount:output_type -> orisun.GetEventCountResponse
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_protos_admin_proto_init() }
-func file_protos_admin_proto_init() {
-	if File_protos_admin_proto != nil {
+func init() { file_admin_proto_init() }
+func file_admin_proto_init() {
+	if File_admin_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protos_admin_proto_rawDesc), len(file_protos_admin_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   21,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_proto_rawDesc), len(file_admin_proto_rawDesc)),
+			NumEnums:      0,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_protos_admin_proto_goTypes,
-		DependencyIndexes: file_protos_admin_proto_depIdxs,
-		EnumInfos:         file_protos_admin_proto_enumTypes,
-		MessageInfos:      file_protos_admin_proto_msgTypes,
+		GoTypes:           file_admin_proto_goTypes,
+		DependencyIndexes: file_admin_proto_depIdxs,
+		MessageInfos:      file_admin_proto_msgTypes,
 	}.Build()
-	File_protos_admin_proto = out.File
-	file_protos_admin_proto_goTypes = nil
-	file_protos_admin_proto_depIdxs = nil
+	File_admin_proto = out.File
+	file_admin_proto_goTypes = nil
+	file_admin_proto_depIdxs = nil
 }

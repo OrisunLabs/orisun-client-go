@@ -727,7 +727,7 @@ func (c *OrisunClient) CreateIndex(ctx context.Context, request *eventstore.Crea
 	c.logger.Debug("Creating index '{}' on boundary '{}'", request.Name, request.Boundary)
 
 	// Make the gRPC call
-	response, err := c.adminClient.CreateIndex(ctx, request)
+	response, err := c.client.CreateIndex(ctx, request)
 	if err != nil {
 		return nil, c.handleAdminException(err, "createIndex")
 	}
@@ -747,7 +747,7 @@ func (c *OrisunClient) DropIndex(ctx context.Context, request *eventstore.DropIn
 	c.logger.Debug("Dropping index '{}' from boundary '{}'", request.Name, request.Boundary)
 
 	// Make the gRPC call
-	response, err := c.adminClient.DropIndex(ctx, request)
+	response, err := c.client.DropIndex(ctx, request)
 	if err != nil {
 		return nil, c.handleAdminException(err, "dropIndex")
 	}
