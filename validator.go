@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/google/uuid"
 	eventstore "github.com/oexza/orisun-client-go/eventstore"
 )
 
@@ -62,15 +61,6 @@ func (v *RequestValidator) validateEventToSave(event *eventstore.EventToSave, in
 		return NewOrisunException(fmt.Sprintf("Event at index %d is missing eventId", index)).
 			AddContext("operation", "saveEvents").
 			AddContext("eventIndex", index).
-			AddContext("boundary", boundary)
-	}
-
-	// Validate UUID format
-	if _, err := uuid.Parse(event.EventId); err != nil {
-		return NewOrisunException(fmt.Sprintf("Event at index %d has invalid eventId format", index)).
-			AddContext("operation", "saveEvents").
-			AddContext("eventIndex", index).
-			AddContext("eventId", event.EventId).
 			AddContext("boundary", boundary)
 	}
 

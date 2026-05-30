@@ -2,20 +2,25 @@ package orisun
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"time"
 
 	eventstore "github.com/oexza/orisun-client-go/eventstore"
 )
+
+// Client is the primary Orisun client type.
+type Client = OrisunClient
 
 // OrisunClient is the main client for interacting with the Orisun event store
 type OrisunClient struct {
@@ -29,6 +34,7 @@ type OrisunClient struct {
 	password       string
 	mu             sync.RWMutex
 	closed         bool
+	ownsConn       bool
 }
 
 // ClientBuilder is used to build an OrisunClient instance
@@ -47,7 +53,11 @@ type ClientBuilder struct {
 	keepAlivePermitWithoutCalls bool
 	dnsTarget                   string
 	staticTarget                string
+	target                      string
 	channel                     *grpc.ClientConn
+	transportCredentials        credentials.TransportCredentials
+	dialOptions                 []grpc.DialOption
+	tokenCache                  *TokenCache
 }
 
 // NewClientBuilder creates a new ClientBuilder with default values
@@ -67,7 +77,7 @@ func NewClientBuilder() *ClientBuilder {
 
 // WithHost adds a server with the given host and default port
 func (b *ClientBuilder) WithHost(host string) *ClientBuilder {
-	return b.WithServer(host, 50051)
+	return b.WithServer(host, 5005)
 }
 
 // WithPort sets the port for the last added server
@@ -111,6 +121,12 @@ func (b *ClientBuilder) WithStaticTarget(staticTarget string) *ClientBuilder {
 	return b
 }
 
+// WithTarget sets a raw gRPC target, for example "localhost:5005" or "dns:///orisun:5005".
+func (b *ClientBuilder) WithTarget(target string) *ClientBuilder {
+	b.target = target
+	return b
+}
+
 // WithDnsResolver sets whether to use DNS resolver
 func (b *ClientBuilder) WithDnsResolver(useDns bool) *ClientBuilder {
 	b.useDnsResolver = useDns
@@ -123,9 +139,37 @@ func (b *ClientBuilder) WithTimeout(seconds int) *ClientBuilder {
 	return b
 }
 
+func (b *ClientBuilder) defaultTimeout(timeout time.Duration) *ClientBuilder {
+	if timeout <= 0 {
+		return b
+	}
+	seconds := int(timeout / time.Second)
+	if timeout%time.Second != 0 {
+		seconds++
+	}
+	if seconds < 1 {
+		seconds = 1
+	}
+	b.timeoutSeconds = seconds
+	return b
+}
+
 // WithTLS sets whether to use TLS
 func (b *ClientBuilder) WithTLS(useTLS bool) *ClientBuilder {
 	b.useTLS = useTLS
+	return b
+}
+
+// WithTransportCredentials sets explicit gRPC transport credentials.
+func (b *ClientBuilder) WithTransportCredentials(creds credentials.TransportCredentials) *ClientBuilder {
+	b.transportCredentials = creds
+	b.useTLS = creds != nil
+	return b
+}
+
+// WithDialOptions appends custom gRPC dial options.
+func (b *ClientBuilder) WithDialOptions(opts ...grpc.DialOption) *ClientBuilder {
+	b.dialOptions = append(b.dialOptions, opts...)
 	return b
 }
 
@@ -185,15 +229,19 @@ func (b *ClientBuilder) Build() (*OrisunClient, error) {
 
 	// Initialize token cache
 	clientTokenCache := NewTokenCache(clientLogger)
+	b.tokenCache = clientTokenCache
 
 	var conn *grpc.ClientConn
 	var err error
+	ownsConn := false
 
 	if b.channel != nil {
 		conn = b.channel
 	} else {
 		// Create channel based on configuration
-		if b.dnsTarget != "" && strings.TrimSpace(b.dnsTarget) != "" {
+		if strings.TrimSpace(b.target) != "" {
+			conn, err = b.createChannel(b.target)
+		} else if b.dnsTarget != "" && strings.TrimSpace(b.dnsTarget) != "" {
 			// DNS-based load balancing
 			target := b.dnsTarget
 			if !strings.HasPrefix(target, "dns:///") {
@@ -245,6 +293,7 @@ func (b *ClientBuilder) Build() (*OrisunClient, error) {
 
 			conn, err = b.createChannel(target)
 		}
+		ownsConn = err == nil
 
 		if err != nil {
 			return nil, NewOrisunExceptionWithCause("Failed to create gRPC channel", err)
@@ -261,6 +310,7 @@ func (b *ClientBuilder) Build() (*OrisunClient, error) {
 		username:       b.username,
 		password:       b.password,
 		closed:         false,
+		ownsConn:       ownsConn,
 	}
 
 	clientLogger.Info("OrisunClient initialized with timeout: {} seconds", b.timeoutSeconds)
@@ -287,6 +337,12 @@ func (b *ClientBuilder) createChannel(target string) (*grpc.ClientConn, error) {
 
 	if !b.useTLS {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else if b.transportCredentials != nil {
+		opts = append(opts, grpc.WithTransportCredentials(b.transportCredentials))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+			MinVersion: tls.VersionTLS12,
+		})))
 	}
 
 	// Add authentication interceptor if credentials are provided
@@ -296,16 +352,24 @@ func (b *ClientBuilder) createChannel(target string) (*grpc.ClientConn, error) {
 		opts = append(opts, grpc.WithStreamInterceptor(b.createStreamAuthInterceptor(basicAuth)))
 	}
 
+	opts = append(opts, b.dialOptions...)
+
 	return grpc.Dial(target, opts...)
 }
 
 // createAuthInterceptor creates a unary interceptor for authentication
 func (b *ClientBuilder) createAuthInterceptor(basicAuth string) grpc.UnaryClientInterceptor {
-	tokenCache := NewTokenCache(nil)
+	tokenCache := b.tokenCache
+	if tokenCache == nil {
+		tokenCache = NewTokenCache(b.logger)
+	}
 
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		// Add authentication metadata
 		md := tokenCache.CreateAuthMetadata(basicAuth)
+		if existing, ok := metadata.FromOutgoingContext(ctx); ok {
+			md = metadata.Join(existing, md)
+		}
 		ctx = metadata.NewOutgoingContext(ctx, md)
 
 		// Create a trailer-only context to extract response headers
@@ -328,10 +392,17 @@ func (b *ClientBuilder) createAuthInterceptor(basicAuth string) grpc.UnaryClient
 
 // createStreamAuthInterceptor creates a stream interceptor for authentication
 func (b *ClientBuilder) createStreamAuthInterceptor(basicAuth string) grpc.StreamClientInterceptor {
+	tokenCache := b.tokenCache
+	if tokenCache == nil {
+		tokenCache = NewTokenCache(b.logger)
+	}
+
 	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 		// Add authentication metadata
-		tokenCache := NewTokenCache(nil) // Create a temporary token cache for the interceptor
 		md := tokenCache.CreateAuthMetadata(basicAuth)
+		if existing, ok := metadata.FromOutgoingContext(ctx); ok {
+			md = metadata.Join(existing, md)
+		}
 		ctx = metadata.NewOutgoingContext(ctx, md)
 
 		// Create the stream with trailer capture
@@ -380,10 +451,10 @@ func (c *OrisunClient) Close() error {
 
 	c.logger.Debug("Closing OrisunClient connection")
 
-	if c.conn != nil {
+	if c.conn != nil && c.ownsConn {
 		err := c.conn.Close()
 		if err != nil {
-			c.logger.Errorf("Error closing connection: %v", err)
+			c.logger.Error("Error closing connection: {}", err)
 			return err
 		}
 		c.logger.Info("OrisunClient connection closed successfully")

@@ -3,6 +3,7 @@ package orisun
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -61,20 +62,20 @@ func (ch *ContextHelper) WithTimeoutMillis(parent context.Context, timeoutMillis
 // RetryConfig holds configuration for retry operations
 type RetryConfig struct {
 	MaxRetries    int
-	InitialDelay   time.Duration
-	MaxDelay       time.Duration
-	BackoffFactor  float64
-	RetryableFunc  func(error) bool
+	InitialDelay  time.Duration
+	MaxDelay      time.Duration
+	BackoffFactor float64
+	RetryableFunc func(error) bool
 }
 
 // DefaultRetryConfig returns a default retry configuration
 func DefaultRetryConfig() *RetryConfig {
 	return &RetryConfig{
 		MaxRetries:    3,
-		InitialDelay:   100 * time.Millisecond,
-		MaxDelay:       5 * time.Second,
-		BackoffFactor:  2.0,
-		RetryableFunc:  DefaultRetryableFunc,
+		InitialDelay:  100 * time.Millisecond,
+		MaxDelay:      5 * time.Second,
+		BackoffFactor: 2.0,
+		RetryableFunc: DefaultRetryableFunc,
 	}
 }
 
@@ -104,7 +105,7 @@ func NewRetryHelper(config *RetryConfig) *RetryHelper {
 func (rh *RetryHelper) Do(fn func() error) error {
 	var lastErr error
 	delay := rh.config.InitialDelay
-	
+
 	for attempt := 0; attempt <= rh.config.MaxRetries; attempt++ {
 		if attempt > 0 {
 			time.Sleep(delay)
@@ -113,20 +114,20 @@ func (rh *RetryHelper) Do(fn func() error) error {
 				delay = rh.config.MaxDelay
 			}
 		}
-		
+
 		err := fn()
 		if err == nil {
 			return nil
 		}
-		
+
 		lastErr = err
-		
+
 		// Check if error is retryable
 		if !rh.config.RetryableFunc(err) {
 			break
 		}
 	}
-	
+
 	return lastErr
 }
 
@@ -134,7 +135,7 @@ func (rh *RetryHelper) Do(fn func() error) error {
 func (rh *RetryHelper) DoWithContext(ctx context.Context, fn func(context.Context) error) error {
 	var lastErr error
 	delay := rh.config.InitialDelay
-	
+
 	for attempt := 0; attempt <= rh.config.MaxRetries; attempt++ {
 		if attempt > 0 {
 			select {
@@ -147,20 +148,20 @@ func (rh *RetryHelper) DoWithContext(ctx context.Context, fn func(context.Contex
 				}
 			}
 		}
-		
+
 		err := fn(ctx)
 		if err == nil {
 			return nil
 		}
-		
+
 		lastErr = err
-		
+
 		// Check if error is retryable
 		if !rh.config.RetryableFunc(err) {
 			break
 		}
 	}
-	
+
 	return lastErr
 }
 
@@ -174,7 +175,7 @@ func NewStringHelper() *StringHelper {
 
 // IsEmpty checks if a string is empty or contains only whitespace
 func (sh *StringHelper) IsEmpty(s string) bool {
-	return len(s) == 0
+	return strings.TrimSpace(s) == ""
 }
 
 // IsNotEmpty checks if a string is not empty and contains more than just whitespace
@@ -184,15 +185,12 @@ func (sh *StringHelper) IsNotEmpty(s string) bool {
 
 // TrimSpace safely trims whitespace from a string
 func (sh *StringHelper) TrimSpace(s string) string {
-	if sh.IsEmpty(s) {
-		return s
-	}
-	return s
+	return strings.TrimSpace(s)
 }
 
 // Contains checks if a string contains the given substring
 func (sh *StringHelper) Contains(s, substr string) bool {
-	return len(s) >= len(substr) && s != "" && substr != ""
+	return strings.Contains(s, substr)
 }
 
 // FormatMessage formats a message with arguments, replacing {} with the arguments
@@ -200,7 +198,7 @@ func (sh *StringHelper) FormatMessage(msg string, args ...interface{}) string {
 	if len(args) == 0 {
 		return msg
 	}
-	
+
 	// Simple implementation - in a real scenario you might want more sophisticated formatting
 	result := msg
 	for i, arg := range args {
@@ -215,7 +213,7 @@ func (sh *StringHelper) FormatMessage(msg string, args ...interface{}) string {
 		}
 		result = replaceFirst(result, placeholder, toString(arg))
 	}
-	
+
 	return result
 }
 

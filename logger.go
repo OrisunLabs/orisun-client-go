@@ -37,7 +37,7 @@ func (l LogLevel) String() string {
 
 // IsEnabled returns true if this level is enabled for the given target level
 func (l LogLevel) IsEnabled(target LogLevel) bool {
-	return l <= target
+	return target >= l
 }
 
 // Logger interface for the Orisun client
@@ -47,10 +47,10 @@ type Logger interface {
 	Warn(msg string, args ...interface{})
 	Error(msg string, args ...interface{})
 	Errorf(msg string, err error, args ...interface{})
-	
+
 	// Check if debug logging is enabled
 	IsDebugEnabled() bool
-	
+
 	// Check if info logging is enabled
 	IsInfoEnabled() bool
 }
@@ -147,21 +147,21 @@ func (l *DefaultLogger) log(level LogLevel, msg string, err error, args ...inter
 	}
 
 	timestamp := time.Now().Format("2006-01-02 15:04:05.000")
-	
+
 	// Format message with arguments
 	formattedMsg := msg
 	if len(args) > 0 {
-		// Replace {} with %s for Go formatting
-		goMsg := strings.ReplaceAll(msg, "{}", "%s")
+		// Replace {} with %v for Go formatting.
+		goMsg := strings.ReplaceAll(msg, "{}", "%v")
 		formattedMsg = fmt.Sprintf(goMsg, args...)
 	}
-	
+
 	logLine := fmt.Sprintf("[%s] %s [goroutine] %s", timestamp, level.String(), formattedMsg)
-	
+
 	if err != nil {
 		logLine = fmt.Sprintf("%s: %v", logLine, err)
 	}
-	
+
 	if level == ERROR || level == WARN {
 		logger.SetOutput(os.Stderr)
 		logger.Println(logLine)
@@ -179,10 +179,10 @@ func NewNoOpLogger() *NoOpLogger {
 	return &NoOpLogger{}
 }
 
-func (l *NoOpLogger) Debug(msg string, args ...interface{}) {}
-func (l *NoOpLogger) Info(msg string, args ...interface{})  {}
-func (l *NoOpLogger) Warn(msg string, args ...interface{})  {}
-func (l *NoOpLogger) Error(msg string, args ...interface{}) {}
+func (l *NoOpLogger) Debug(msg string, args ...interface{})             {}
+func (l *NoOpLogger) Info(msg string, args ...interface{})              {}
+func (l *NoOpLogger) Warn(msg string, args ...interface{})              {}
+func (l *NoOpLogger) Error(msg string, args ...interface{})             {}
 func (l *NoOpLogger) Errorf(msg string, err error, args ...interface{}) {}
-func (l *NoOpLogger) IsDebugEnabled() bool                     { return false }
-func (l *NoOpLogger) IsInfoEnabled() bool                      { return false }
+func (l *NoOpLogger) IsDebugEnabled() bool                              { return false }
+func (l *NoOpLogger) IsInfoEnabled() bool                               { return false }

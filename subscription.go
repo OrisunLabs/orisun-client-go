@@ -42,6 +42,9 @@ func NewEventSubscription(
 	if logger == nil {
 		logger = NewNoOpLogger()
 	}
+	if handler == nil {
+		handler = noopEventHandler{}
+	}
 
 	subscription := &EventSubscription{
 		stream:  stream,
@@ -75,42 +78,40 @@ func (es *EventSubscription) processEvents() {
 		event := &eventstore.Event{}
 		err := es.stream.RecvMsg(event)
 		if err != nil {
-			es.mu.RLock()
-			if !es.closed {
-				es.logger.Errorf("Subscription error: %v", err)
+			if !es.IsClosed() {
+				es.logger.Error("Subscription error: {}", err)
 				es.handler.OnError(err)
 			}
-			es.mu.RUnlock()
 			return
 		}
 
-		es.mu.RLock()
-		if !es.closed {
+		if !es.IsClosed() {
 			es.logger.Debug("Received event from stream: %s", event.EventId)
 			if handlerErr := es.handler.OnEvent(event); handlerErr != nil {
-				es.logger.Errorf("Handler error: %v", handlerErr)
+				es.logger.Error("Handler error: {}", handlerErr)
 			}
 		}
-		es.mu.RUnlock()
 	}
 }
 
 // Close closes the subscription
 func (es *EventSubscription) Close() error {
 	es.mu.Lock()
-	defer es.mu.Unlock()
-
 	if es.closed {
+		es.mu.Unlock()
 		es.logger.Debug("Subscription already closed")
 		return nil
 	}
 
 	es.logger.Debug("Closing subscription")
 	es.closed = true
+	cancel := es.cancel
+	done := es.done
+	es.mu.Unlock()
 
 	// Cancel the context
-	if es.cancel != nil {
-		es.cancel()
+	if cancel != nil {
+		cancel()
 	}
 
 	// Call the completion handler
@@ -118,7 +119,7 @@ func (es *EventSubscription) Close() error {
 
 	// Wait for the processing goroutine to finish with timeout
 	select {
-	case <-es.done:
+	case <-done:
 		// Processing goroutine finished normally
 	case <-time.After(5 * time.Second):
 		// Timeout reached, log and continue
@@ -228,3 +229,9 @@ func (h *SimpleEventHandler) OnCompleted() {
 		h.onCompletedFunc()
 	}
 }
+
+type noopEventHandler struct{}
+
+func (noopEventHandler) OnEvent(*eventstore.Event) error { return nil }
+func (noopEventHandler) OnError(error)                   {}
+func (noopEventHandler) OnCompleted()                    {}

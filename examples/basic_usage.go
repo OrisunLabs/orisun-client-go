@@ -6,24 +6,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/goccy/go-json"
-	orisun "github.com/oexza/Orisun/clients/go"
 	"log"
 	"time"
 
-	"github.com/google/uuid"
-	eventstore "github.com/oexza/Orisun/clients/go/eventstore"
+	"github.com/goccy/go-json"
+	orisun "github.com/oexza/orisun-client-go"
+	eventstore "github.com/oexza/orisun-client-go/eventstore"
 )
 
 func main() {
-	// Create a new client builder
-	client, err := orisun.NewClientBuilder().
-		WithHost("localhost").
-		WithPort(5005).
-		WithTimeout(30).
-		WithBasicAuth("admin", "changeit").
-		Build()
-
+	client, err := orisun.New(
+		"localhost:5005",
+		orisun.WithCredentials("admin", "changeit"),
+		orisun.WithDefaultTimeout(30*time.Second),
+		orisun.WithInsecure(),
+	)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
@@ -69,13 +66,13 @@ func main() {
 
 	events := []*eventstore.EventToSave{
 		{
-			EventId:   uuid.New().String(),
+			EventId:   "user-12345-login",
 			EventType: "UserLoggedIn",
 			Data:      string(eventJson),
 			Metadata:  `{"source": "web-app"}`,
 		},
 		{
-			EventId:   uuid.New().String(),
+			EventId:   "user-12345-dashboard-view",
 			EventType: "UserAction",
 			Data:      `{"page": "/dashboard", "action": "view"}`,
 			Metadata:  `{"source": "web-app"}`,

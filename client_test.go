@@ -2,6 +2,7 @@ package orisun
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -81,6 +82,22 @@ func TestClientBuilder_WithBasicAuth(t *testing.T) {
 
 	// Note: We can't easily test the auth without actual gRPC calls
 	// but we can verify the client was created successfully
+	assert.False(t, client.IsClosed())
+}
+
+func TestNewClient(t *testing.T) {
+	client, err := New(
+		"localhost:5005",
+		WithCredentials("username", "password"),
+		WithDefaultTimeout(45*time.Second),
+		WithInsecure(),
+	)
+
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	assert.Equal(t, 45*time.Second, client.GetDefaultTimeout())
 	assert.False(t, client.IsClosed())
 }
 
@@ -168,6 +185,10 @@ func TestOrisunException(t *testing.T) {
 
 	expectedMsg := "test error [Context: key=value]"
 	assert.Equal(t, expectedMsg, err.Error())
+
+	cause := errors.New("root cause")
+	err = NewOrisunExceptionWithCause("wrapped", cause)
+	assert.True(t, errors.Is(err, cause))
 }
 
 func TestOrisunExceptionWithCause(t *testing.T) {
@@ -262,10 +283,14 @@ func TestStringHelper(t *testing.T) {
 	helper := NewStringHelper()
 
 	assert.True(t, helper.IsEmpty(""))
+	assert.True(t, helper.IsEmpty("  "))
 	assert.False(t, helper.IsEmpty("test"))
 
 	assert.False(t, helper.IsNotEmpty(""))
 	assert.True(t, helper.IsNotEmpty("test"))
+	assert.Equal(t, "test", helper.TrimSpace("  test  "))
+	assert.True(t, helper.Contains("hello world", "world"))
+	assert.True(t, helper.Contains("hello", ""))
 
 	message := helper.FormatMessage("Hello {}, you have {} messages", "Alice", 5)
 	assert.Equal(t, "Hello Alice, you have 5 messages", message)
@@ -351,12 +376,12 @@ func TestClient_SaveEvents(t *testing.T) {
 	require.NotNil(t, client)
 	defer client.Close()
 
-	// Test with valid request
+	// Test with valid request. Event IDs are application-defined strings.
 	request := &eventstore.SaveEventsRequest{
 		Boundary: "test-boundary",
 		Events: []*eventstore.EventToSave{
 			{
-				EventId:   "550e8400-e29b-41d4-a716-446655440000000",
+				EventId:   "test-1",
 				EventType: "TestEvent",
 				Data:      "test data 1",
 			},
@@ -366,7 +391,7 @@ func TestClient_SaveEvents(t *testing.T) {
 	// This will fail without actual server, but we test the method exists and validation works
 	_, err = client.SaveEvents(context.Background(), request)
 	assert.Error(t, err) // Expected to fail without actual server
-	assert.Contains(t, err.Error(), "Event at index 0 has invalid eventId format")
+	assert.Contains(t, err.Error(), "Failed to save events")
 }
 
 // Test SaveEvents with nil request
@@ -492,9 +517,12 @@ func TestClient_SubscribeToEvents(t *testing.T) {
 		SubscriberName: "test-subscriber",
 	}
 
-	// This will fail without actual server, but we test the method exists and validation works
-	_, err = client.SubscribeToEvents(context.Background(), request, handler)
-	assert.Error(t, err) // Expected to fail without actual server
+	subscription, err := client.SubscribeToEvents(context.Background(), request, handler)
+	if err == nil {
+		assert.NotNil(t, subscription)
+		assert.NoError(t, subscription.Close())
+		return
+	}
 	assert.Contains(t, err.Error(), "Failed to create subscription")
 }
 
@@ -534,7 +562,7 @@ func TestClient_SubscribeToEvents_Validation(t *testing.T) {
 }
 
 // Test error handling scenarios
-func TestClient_SaveEvents_ErrorHandling(t *testing.T) {
+func TestClient_SaveEvents_EventIDIsApplicationDefined(t *testing.T) {
 	builder := NewClientBuilder()
 	client, err := builder.WithHost("localhost").Build()
 
@@ -542,7 +570,6 @@ func TestClient_SaveEvents_ErrorHandling(t *testing.T) {
 	require.NotNil(t, client)
 	defer client.Close()
 
-	// Test with invalid event ID format
 	request := &eventstore.SaveEventsRequest{
 		Boundary: "test-boundary",
 		Events: []*eventstore.EventToSave{
@@ -556,7 +583,7 @@ func TestClient_SaveEvents_ErrorHandling(t *testing.T) {
 
 	_, err = client.SaveEvents(context.Background(), request)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid eventId format")
+	assert.Contains(t, err.Error(), "Failed to save events")
 }
 
 // Test edge cases for boundary conditions
