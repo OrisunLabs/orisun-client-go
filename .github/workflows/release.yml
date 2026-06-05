@@ -25,7 +25,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26.0'
           check-latest: true
 
       - name: Extract version from tag
@@ -92,21 +92,26 @@ jobs:
 
             import (
                 "context"
-                "github.com/oexza/orisun-client-go/orisun"
+                "time"
+
+                orisun "github.com/oexza/orisun-client-go"
             )
 
             func main() {
-                client, err := orisun.NewClientBuilder().
-                    WithHost("localhost").
-                    WithPort(5005).
-                    WithBasicAuth("admin", "changeit").
-                    Build(context.Background())
+                client, err := orisun.New(
+                    "localhost:5005",
+                    orisun.WithCredentials("admin", "changeit"),
+                    orisun.WithDefaultTimeout(30*time.Second),
+                    orisun.WithInsecure(),
+                )
                 if err != nil {
                     panic(err)
                 }
                 defer client.Close()
 
-                // Use the client...
+                if err := client.Ping(context.Background()); err != nil {
+                    panic(err)
+                }
             }
             ```
           draft: false

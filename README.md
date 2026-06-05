@@ -1,5 +1,7 @@
 # Orisun Go Client
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/oexza/orisun-client-go.svg)](https://pkg.go.dev/github.com/oexza/orisun-client-go)
+
 Idiomatic Go client for the Orisun EventStore and Admin gRPC APIs.
 
 ## Install
@@ -182,6 +184,23 @@ mv protos/*.go eventstore/
 
 ```bash
 go test ./...
+```
+
+## Release
+
+Go packages are published by pushing a semantic version tag to the module's Git
+repository. After the tag is public, `pkg.go.dev` indexes the package from
+GitHub.
+
+```bash
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+Users can install a specific release with:
+
+```bash
+go get github.com/oexza/orisun-client-go@vX.Y.Z
 ```
 
 ## License

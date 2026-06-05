@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestClientBuilder_WithHost(t *testing.T) {
@@ -664,7 +665,8 @@ func (m *mockEventStream) RecvMsg(msg interface{}) error {
 
 	// Convert mock event to protobuf event
 	if eventMsg, ok := msg.(*eventstore.Event); ok {
-		*eventMsg = *event
+		proto.Reset(eventMsg)
+		proto.Merge(eventMsg, event)
 	}
 
 	return nil
