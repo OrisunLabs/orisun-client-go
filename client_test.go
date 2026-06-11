@@ -490,6 +490,70 @@ func TestClient_GetEvents_Validation(t *testing.T) {
 	assert.Contains(t, err.Error(), "Count must be greater than 0")
 }
 
+// Test GetLatestByCriteria method
+func TestClient_GetLatestByCriteria(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	request := &eventstore.GetLatestByCriteriaRequest{
+		Boundary: "test-boundary",
+		Criteria: []*eventstore.Criterion{
+			{
+				Tags: []*eventstore.Tag{
+					{Key: "account_id", Value: "acct-1"},
+				},
+			},
+		},
+	}
+
+	_, err = client.GetLatestByCriteria(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Failed to get latest events by criteria")
+}
+
+// Test GetLatestByCriteria with validation errors
+func TestClient_GetLatestByCriteria_Validation(t *testing.T) {
+	builder := NewClientBuilder()
+	client, err := builder.WithHost("localhost").Build()
+
+	require.NoError(t, err)
+	require.NotNil(t, client)
+	defer client.Close()
+
+	_, err = client.GetLatestByCriteria(context.Background(), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "GetLatestByCriteriaRequest cannot be nil")
+
+	request := &eventstore.GetLatestByCriteriaRequest{
+		Boundary: "",
+		Criteria: []*eventstore.Criterion{
+			{Tags: []*eventstore.Tag{{Key: "account_id", Value: "acct-1"}}},
+		},
+	}
+	_, err = client.GetLatestByCriteria(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Boundary is required")
+
+	request = &eventstore.GetLatestByCriteriaRequest{
+		Boundary: "test-boundary",
+	}
+	_, err = client.GetLatestByCriteria(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "At least one criterion is required")
+
+	request = &eventstore.GetLatestByCriteriaRequest{
+		Boundary: "test-boundary",
+		Criteria: []*eventstore.Criterion{{}},
+	}
+	_, err = client.GetLatestByCriteria(context.Background(), request)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Criterion at index 0 must include at least one tag")
+}
+
 // Test SubscribeToEvents method
 func TestClient_SubscribeToEvents(t *testing.T) {
 	builder := NewClientBuilder()

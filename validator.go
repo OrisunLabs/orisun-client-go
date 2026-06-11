@@ -108,6 +108,37 @@ func (v *RequestValidator) ValidateGetEventsRequest(request *eventstore.GetEvent
 	return nil
 }
 
+// ValidateGetLatestByCriteriaRequest validates a GetLatestByCriteriaRequest
+func (v *RequestValidator) ValidateGetLatestByCriteriaRequest(request *eventstore.GetLatestByCriteriaRequest) error {
+	if request == nil {
+		return NewOrisunException("GetLatestByCriteriaRequest cannot be nil").
+			AddContext("operation", "getLatestByCriteria")
+	}
+
+	if strings.TrimSpace(request.Boundary) == "" {
+		return NewOrisunException("Boundary is required").
+			AddContext("operation", "getLatestByCriteria").
+			AddContext("request", "GetLatestByCriteriaRequest")
+	}
+
+	if len(request.Criteria) == 0 {
+		return NewOrisunException("At least one criterion is required").
+			AddContext("operation", "getLatestByCriteria").
+			AddContext("boundary", request.Boundary)
+	}
+
+	for i, criterion := range request.Criteria {
+		if criterion == nil || len(criterion.Tags) == 0 {
+			return NewOrisunException(fmt.Sprintf("Criterion at index %d must include at least one tag", i)).
+				AddContext("operation", "getLatestByCriteria").
+				AddContext("criterionIndex", i).
+				AddContext("boundary", request.Boundary)
+		}
+	}
+
+	return nil
+}
+
 // ValidateSubscribeRequest validates a CatchUpSubscribeToEventStoreRequest
 func (v *RequestValidator) ValidateSubscribeRequest(request *eventstore.CatchUpSubscribeToEventStoreRequest) error {
 	if request == nil {

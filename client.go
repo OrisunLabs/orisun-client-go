@@ -565,6 +565,24 @@ func (c *OrisunClient) GetEvents(ctx context.Context, request *eventstore.GetEve
 	return response, nil
 }
 
+// GetLatestByCriteria retrieves the latest event for each criterion from one server-side read snapshot.
+func (c *OrisunClient) GetLatestByCriteria(ctx context.Context, request *eventstore.GetLatestByCriteriaRequest) (*eventstore.GetLatestByCriteriaResponse, error) {
+	validator := NewRequestValidator()
+	if err := validator.ValidateGetLatestByCriteriaRequest(request); err != nil {
+		return nil, err
+	}
+
+	c.logger.Debug("Getting latest events by criteria from boundary: {}", request.Boundary)
+
+	response, err := c.client.GetLatestByCriteria(ctx, request)
+	if err != nil {
+		return nil, c.handleGetLatestByCriteriaException(err, request)
+	}
+
+	c.logger.Debug("Successfully retrieved {} latest criteria results", len(response.Results))
+	return response, nil
+}
+
 // SubscribeToEvents subscribes to events from the event store
 func (c *OrisunClient) SubscribeToEvents(ctx context.Context, request *eventstore.CatchUpSubscribeToEventStoreRequest, handler EventHandler) (*EventSubscription, error) {
 	// Validate request
@@ -628,6 +646,22 @@ func (c *OrisunClient) handleGetException(err error, request *eventstore.GetEven
 
 	return NewOrisunExceptionWithCause("Failed to get events", err).
 		AddContext("operation", "getEvents").
+		AddContext("boundary", request.Boundary).
+		AddContext("statusCode", st.Code().String()).
+		AddContext("statusDescription", st.Message())
+}
+
+// handleGetLatestByCriteriaException handles exceptions from GetLatestByCriteria operations
+func (c *OrisunClient) handleGetLatestByCriteriaException(err error, request *eventstore.GetLatestByCriteriaRequest) error {
+	st, ok := status.FromError(err)
+	if !ok {
+		return NewOrisunExceptionWithCause("Failed to get latest events by criteria", err).
+			AddContext("operation", "getLatestByCriteria").
+			AddContext("boundary", request.Boundary)
+	}
+
+	return NewOrisunExceptionWithCause("Failed to get latest events by criteria", err).
+		AddContext("operation", "getLatestByCriteria").
 		AddContext("boundary", request.Boundary).
 		AddContext("statusCode", st.Code().String()).
 		AddContext("statusDescription", st.Message())

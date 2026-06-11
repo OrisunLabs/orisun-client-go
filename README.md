@@ -97,6 +97,34 @@ for _, event := range resp.Events {
 }
 ```
 
+## Reading Latest Context State
+
+For carried-state command contexts, use `GetLatestByCriteria` to read the latest event for each criterion from one server-side snapshot. Use the returned `ContextPosition` as the next `SaveEvents.Query.ExpectedPosition` with the same combined criteria.
+
+```go
+resp, err := client.GetLatestByCriteria(ctx, &eventstore.GetLatestByCriteriaRequest{
+	Boundary: "accounts",
+	Criteria: []*eventstore.Criterion{
+		{
+			Tags: []*eventstore.Tag{
+				{Key: "account_id", Value: "acct-1"},
+			},
+		},
+		{
+			Tags: []*eventstore.Tag{
+				{Key: "account_id", Value: "acct-2"},
+			},
+		},
+	},
+})
+if err != nil {
+	return err
+}
+
+expectedPosition := resp.ContextPosition
+_ = expectedPosition
+```
+
 ## Subscriptions
 
 ```go
