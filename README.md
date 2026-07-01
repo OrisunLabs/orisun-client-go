@@ -107,12 +107,24 @@ resp, err := client.GetLatestByCriteria(ctx, &eventstore.GetLatestByCriteriaRequ
 	Criteria: []*eventstore.Criterion{
 		{
 			Tags: []*eventstore.Tag{
-				{Key: "account_id", Value: "acct-1"},
+				{Key: "eventType", Value: "AccountOpened"},
+				{Key: "accountOpenedId", Value: "018f2d5e-2001-7000-8000-000000000001"},
 			},
 		},
 		{
 			Tags: []*eventstore.Tag{
-				{Key: "account_id", Value: "acct-2"},
+				{Key: "scopes.accountOpenedId", Value: "018f2d5e-2001-7000-8000-000000000001"},
+			},
+		},
+		{
+			Tags: []*eventstore.Tag{
+				{Key: "eventType", Value: "AccountOpened"},
+				{Key: "accountOpenedId", Value: "018f2d5e-2002-7000-8000-000000000002"},
+			},
+		},
+		{
+			Tags: []*eventstore.Tag{
+				{Key: "scopes.accountOpenedId", Value: "018f2d5e-2002-7000-8000-000000000002"},
 			},
 		},
 	},
