@@ -19,6 +19,13 @@ import (
 	eventstore "github.com/oexza/orisun-client-go/eventstore"
 )
 
+const (
+	defaultMaxReceiveMessageSize = 100 * 1024 * 1024
+	defaultMaxSendMessageSize    = 100 * 1024 * 1024
+	defaultFlowControlWindow     = 1024 * 1024
+	maxInt32Value                = 1<<31 - 1
+)
+
 // Client is the primary Orisun client type.
 type Client = OrisunClient
 
@@ -58,6 +65,9 @@ type ClientBuilder struct {
 	transportCredentials        credentials.TransportCredentials
 	dialOptions                 []grpc.DialOption
 	tokenCache                  *TokenCache
+	maxReceiveMessageSize       int
+	maxSendMessageSize          int
+	flowControlWindow           int
 }
 
 // NewClientBuilder creates a new ClientBuilder with default values
@@ -71,6 +81,9 @@ func NewClientBuilder() *ClientBuilder {
 		keepAliveTimeMs:             30 * time.Second,
 		keepAliveTimeoutMs:          10 * time.Second,
 		keepAlivePermitWithoutCalls: true,
+		maxReceiveMessageSize:       defaultMaxReceiveMessageSize,
+		maxSendMessageSize:          defaultMaxSendMessageSize,
+		flowControlWindow:           defaultFlowControlWindow,
 		servers:                     make([]*ServerAddress, 0),
 	}
 }
@@ -216,6 +229,30 @@ func (b *ClientBuilder) WithKeepAlivePermitWithoutCalls(permitWithoutCalls bool)
 	return b
 }
 
+// WithMaxReceiveMessageSize sets the maximum inbound gRPC message size in bytes.
+func (b *ClientBuilder) WithMaxReceiveMessageSize(bytes int) *ClientBuilder {
+	if bytes > 0 {
+		b.maxReceiveMessageSize = bytes
+	}
+	return b
+}
+
+// WithMaxSendMessageSize sets the maximum outbound gRPC message size in bytes.
+func (b *ClientBuilder) WithMaxSendMessageSize(bytes int) *ClientBuilder {
+	if bytes > 0 {
+		b.maxSendMessageSize = bytes
+	}
+	return b
+}
+
+// WithFlowControlWindow sets the HTTP/2 stream and connection flow-control window.
+func (b *ClientBuilder) WithFlowControlWindow(bytes int) *ClientBuilder {
+	if bytes > 0 && bytes <= maxInt32Value {
+		b.flowControlWindow = bytes
+	}
+	return b
+}
+
 // Build creates the OrisunClient instance
 func (b *ClientBuilder) Build() (*OrisunClient, error) {
 	// Initialize logger
@@ -327,6 +364,12 @@ func (b *ClientBuilder) createChannel(target string) (*grpc.ClientConn, error) {
 
 	opts := []grpc.DialOption{
 		grpc.WithKeepaliveParams(kp),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(b.maxReceiveMessageSize),
+			grpc.MaxCallSendMsgSize(b.maxSendMessageSize),
+		),
+		grpc.WithInitialWindowSize(int32(b.flowControlWindow)),
+		grpc.WithInitialConnWindowSize(int32(b.flowControlWindow)),
 	}
 
 	// Set up load balancing configuration

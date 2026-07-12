@@ -170,6 +170,9 @@ client, err := orisun.New(
 	orisun.WithCredentials("admin", "changeit"),
 	orisun.WithDefaultTimeout(30*time.Second),
 	orisun.WithLogLevel(orisun.INFO),
+	orisun.WithMaxReceiveMessageSize(100*1024*1024),
+	orisun.WithMaxSendMessageSize(100*1024*1024),
+	orisun.WithFlowControlWindow(1024*1024),
 	orisun.WithInsecure(),
 )
 ```
@@ -183,8 +186,34 @@ Available options:
 - `WithInsecure()` uses plaintext transport for local development.
 - `WithTransportCredentials(creds)` sets explicit gRPC transport credentials.
 - `WithGRPCDialOptions(opts...)` appends raw gRPC dial options.
+- `WithMaxReceiveMessageSize(bytes)` overrides the maximum inbound gRPC message size. The default is 100 MB.
+- `WithMaxSendMessageSize(bytes)` overrides the maximum outbound gRPC message size. The default is 100 MB.
+- `WithFlowControlWindow(bytes)` overrides the HTTP/2 stream and connection flow-control window. The default is 1 MB.
 
 The older `NewClientBuilder` API remains available for compatibility, but new code should prefer `New` with options.
+
+## High-Throughput Writes
+
+Use one client per target and reuse it. The client caches Orisun auth tokens after the first authenticated response, so hot `SaveEvents` calls should use the cached token path rather than repeatedly sending Basic credentials.
+
+For burst imports or very high write volume, keep roughly 512-1024 `SaveEvents` calls in flight instead of launching an unbounded number of goroutines. The server can process large bursts, but flooding one HTTP/2 connection with every pending write at once adds client-side scheduling and stream overhead.
+
+```go
+sem := make(chan struct{}, 1024)
+var wg sync.WaitGroup
+
+for _, req := range requests {
+	wg.Add(1)
+	sem <- struct{}{}
+	go func(req *eventstore.SaveEventsRequest) {
+		defer wg.Done()
+		defer func() { <-sem }()
+		_, _ = client.SaveEvents(ctx, req)
+	}(req)
+}
+
+wg.Wait()
+```
 
 ## Errors
 

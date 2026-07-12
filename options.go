@@ -72,3 +72,24 @@ func WithGRPCDialOptions(opts ...grpc.DialOption) Option {
 		builder.WithDialOptions(opts...)
 	}
 }
+
+// WithMaxReceiveMessageSize configures the maximum inbound gRPC message size.
+func WithMaxReceiveMessageSize(bytes int) Option {
+	return func(builder *ClientBuilder) {
+		builder.WithMaxReceiveMessageSize(bytes)
+	}
+}
+
+// WithMaxSendMessageSize configures the maximum outbound gRPC message size.
+func WithMaxSendMessageSize(bytes int) Option {
+	return func(builder *ClientBuilder) {
+		builder.WithMaxSendMessageSize(bytes)
+	}
+}
+
+// WithFlowControlWindow configures the HTTP/2 stream and connection flow-control window.
+func WithFlowControlWindow(bytes int) Option {
+	return func(builder *ClientBuilder) {
+		builder.WithFlowControlWindow(bytes)
+	}
+}

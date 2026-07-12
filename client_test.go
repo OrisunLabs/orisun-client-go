@@ -70,6 +70,37 @@ func TestClientBuilder_WithTimeout(t *testing.T) {
 	assert.Equal(t, 60*time.Second, client.GetDefaultTimeout())
 }
 
+func TestClientBuilder_TransportTuningDefaults(t *testing.T) {
+	builder := NewClientBuilder()
+
+	assert.Equal(t, 100*1024*1024, builder.maxReceiveMessageSize)
+	assert.Equal(t, 100*1024*1024, builder.maxSendMessageSize)
+	assert.Equal(t, 1024*1024, builder.flowControlWindow)
+}
+
+func TestClientBuilder_TransportTuningOverrides(t *testing.T) {
+	builder := NewClientBuilder().
+		WithMaxReceiveMessageSize(64 * 1024 * 1024).
+		WithMaxSendMessageSize(32 * 1024 * 1024).
+		WithFlowControlWindow(2 * 1024 * 1024)
+
+	assert.Equal(t, 64*1024*1024, builder.maxReceiveMessageSize)
+	assert.Equal(t, 32*1024*1024, builder.maxSendMessageSize)
+	assert.Equal(t, 2*1024*1024, builder.flowControlWindow)
+}
+
+func TestClientOptions_TransportTuningOverrides(t *testing.T) {
+	builder := NewClientBuilder()
+
+	WithMaxReceiveMessageSize(64 * 1024 * 1024)(builder)
+	WithMaxSendMessageSize(32 * 1024 * 1024)(builder)
+	WithFlowControlWindow(2 * 1024 * 1024)(builder)
+
+	assert.Equal(t, 64*1024*1024, builder.maxReceiveMessageSize)
+	assert.Equal(t, 32*1024*1024, builder.maxSendMessageSize)
+	assert.Equal(t, 2*1024*1024, builder.flowControlWindow)
+}
+
 func TestClientBuilder_WithBasicAuth(t *testing.T) {
 	builder := NewClientBuilder()
 	client, err := builder.
