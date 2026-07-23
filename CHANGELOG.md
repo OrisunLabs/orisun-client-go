@@ -4,6 +4,8 @@ All notable changes to the Orisun Go client will be documented in this file.
 
 ## Unreleased
 
+- Added create, import, list, and get APIs for dynamic consistency boundaries.
+- Regenerated protobuf bindings for the event-backed boundary catalog.
 - Updated the module and CI/release toolchains to Go 1.26.5.
 
 ## v0.2.1 - 2026-06-05

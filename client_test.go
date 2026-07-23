@@ -848,6 +848,32 @@ func TestClient_CreateUser_Validation(t *testing.T) {
 	assert.Contains(t, err.Error(), "Password is required")
 }
 
+func TestClient_BoundaryManagement_Validation(t *testing.T) {
+	client, err := NewClientBuilder().WithHost("localhost").Build()
+	require.NoError(t, err)
+	defer client.Close()
+
+	_, err = client.CreateBoundary(context.Background(), nil)
+	require.ErrorContains(t, err, "CreateBoundaryRequest cannot be nil")
+
+	_, err = client.CreateBoundary(context.Background(), &eventstore.CreateBoundaryRequest{
+		Name: "orders",
+	})
+	require.ErrorContains(t, err, "Boundary placement is required")
+
+	_, err = client.ImportBoundary(context.Background(), &eventstore.ImportBoundaryRequest{
+		Name:      "orders",
+		Placement: &eventstore.BoundaryPlacementInput{Backend: "postgres"},
+	})
+	require.ErrorContains(t, err, "Boundary placement namespace is required")
+
+	_, err = client.ListBoundaries(context.Background(), nil)
+	require.ErrorContains(t, err, "ListBoundariesRequest cannot be nil")
+
+	_, err = client.GetBoundary(context.Background(), &eventstore.GetBoundaryRequest{})
+	require.ErrorContains(t, err, "Boundary name is required")
+}
+
 // Test DeleteUser validation
 func TestClient_DeleteUser_Validation(t *testing.T) {
 	builder := NewClientBuilder()
@@ -1002,6 +1028,34 @@ func TestClient_GetEventCount_Validation(t *testing.T) {
 // Test admin request validators directly
 func TestRequestValidator_AdminRequests(t *testing.T) {
 	validator := NewRequestValidator()
+
+	t.Run("BoundaryRequests", func(t *testing.T) {
+		placement := &eventstore.BoundaryPlacementInput{Backend: "postgres", Namespace: "orders"}
+		assert.NoError(t, validator.ValidateCreateBoundaryRequest(&eventstore.CreateBoundaryRequest{
+			Name: "orders", Placement: placement,
+		}))
+		assert.NoError(t, validator.ValidateImportBoundaryRequest(&eventstore.ImportBoundaryRequest{
+			Name: "orders", Placement: placement,
+		}))
+		assert.NoError(t, validator.ValidateListBoundariesRequest(&eventstore.ListBoundariesRequest{}))
+		assert.NoError(t, validator.ValidateGetBoundaryRequest(&eventstore.GetBoundaryRequest{Name: "orders"}))
+
+		err := validator.ValidateCreateBoundaryRequest(&eventstore.CreateBoundaryRequest{
+			Name: "orders",
+			Placement: &eventstore.BoundaryPlacementInput{
+				Namespace: "orders",
+			},
+		})
+		assert.ErrorContains(t, err, "backend is required")
+
+		err = validator.ValidateImportBoundaryRequest(&eventstore.ImportBoundaryRequest{
+			Name: "orders",
+			Placement: &eventstore.BoundaryPlacementInput{
+				Backend: "postgres",
+			},
+		})
+		assert.ErrorContains(t, err, "namespace is required")
+	})
 
 	// Test CreateUserRequest validation
 	t.Run("CreateUserRequest", func(t *testing.T) {

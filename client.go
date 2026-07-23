@@ -724,6 +724,62 @@ func (c *OrisunClient) handleSubscribeException(err error, request any) error {
 		AddContext("statusDescription", st.Message())
 }
 
+// CreateBoundary records and provisions a new boundary.
+func (c *OrisunClient) CreateBoundary(ctx context.Context, request *eventstore.CreateBoundaryRequest) (*eventstore.CreateBoundaryResponse, error) {
+	validator := NewRequestValidator()
+	if err := validator.ValidateCreateBoundaryRequest(request); err != nil {
+		return nil, err
+	}
+
+	response, err := c.adminClient.CreateBoundary(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "createBoundary")
+	}
+	return response, nil
+}
+
+// ImportBoundary registers and provisions an existing physical boundary.
+func (c *OrisunClient) ImportBoundary(ctx context.Context, request *eventstore.ImportBoundaryRequest) (*eventstore.ImportBoundaryResponse, error) {
+	validator := NewRequestValidator()
+	if err := validator.ValidateImportBoundaryRequest(request); err != nil {
+		return nil, err
+	}
+
+	response, err := c.adminClient.ImportBoundary(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "importBoundary")
+	}
+	return response, nil
+}
+
+// ListBoundaries returns the event-backed boundary catalog.
+func (c *OrisunClient) ListBoundaries(ctx context.Context, request *eventstore.ListBoundariesRequest) (*eventstore.ListBoundariesResponse, error) {
+	validator := NewRequestValidator()
+	if err := validator.ValidateListBoundariesRequest(request); err != nil {
+		return nil, err
+	}
+
+	response, err := c.adminClient.ListBoundaries(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "listBoundaries")
+	}
+	return response, nil
+}
+
+// GetBoundary returns one boundary from the event-backed catalog.
+func (c *OrisunClient) GetBoundary(ctx context.Context, request *eventstore.GetBoundaryRequest) (*eventstore.GetBoundaryResponse, error) {
+	validator := NewRequestValidator()
+	if err := validator.ValidateGetBoundaryRequest(request); err != nil {
+		return nil, err
+	}
+
+	response, err := c.adminClient.GetBoundary(ctx, request)
+	if err != nil {
+		return nil, c.handleAdminException(err, "getBoundary")
+	}
+	return response, nil
+}
+
 // CreateUser creates a new user
 func (c *OrisunClient) CreateUser(ctx context.Context, request *eventstore.CreateUserRequest) (*eventstore.CreateUserResponse, error) {
 	// Validate request

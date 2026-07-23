@@ -163,6 +163,81 @@ func (v *RequestValidator) ValidateSubscribeRequest(request *eventstore.CatchUpS
 	return nil
 }
 
+// ValidateCreateBoundaryRequest validates a CreateBoundaryRequest.
+func (v *RequestValidator) ValidateCreateBoundaryRequest(request *eventstore.CreateBoundaryRequest) error {
+	if request == nil {
+		return NewOrisunException("CreateBoundaryRequest cannot be nil").
+			AddContext("operation", "createBoundary")
+	}
+	return v.validateBoundaryDefinition(
+		request.Name,
+		request.Placement,
+		"createBoundary",
+	)
+}
+
+// ValidateImportBoundaryRequest validates an ImportBoundaryRequest.
+func (v *RequestValidator) ValidateImportBoundaryRequest(request *eventstore.ImportBoundaryRequest) error {
+	if request == nil {
+		return NewOrisunException("ImportBoundaryRequest cannot be nil").
+			AddContext("operation", "importBoundary")
+	}
+	return v.validateBoundaryDefinition(
+		request.Name,
+		request.Placement,
+		"importBoundary",
+	)
+}
+
+func (v *RequestValidator) validateBoundaryDefinition(
+	name string,
+	placement *eventstore.BoundaryPlacementInput,
+	operation string,
+) error {
+	if strings.TrimSpace(name) == "" {
+		return NewOrisunException("Boundary name is required").
+			AddContext("operation", operation)
+	}
+	if placement == nil {
+		return NewOrisunException("Boundary placement is required").
+			AddContext("operation", operation).
+			AddContext("boundary", name)
+	}
+	if strings.TrimSpace(placement.Backend) == "" {
+		return NewOrisunException("Boundary placement backend is required").
+			AddContext("operation", operation).
+			AddContext("boundary", name)
+	}
+	if strings.TrimSpace(placement.Namespace) == "" {
+		return NewOrisunException("Boundary placement namespace is required").
+			AddContext("operation", operation).
+			AddContext("boundary", name)
+	}
+	return nil
+}
+
+// ValidateListBoundariesRequest validates a ListBoundariesRequest.
+func (v *RequestValidator) ValidateListBoundariesRequest(request *eventstore.ListBoundariesRequest) error {
+	if request == nil {
+		return NewOrisunException("ListBoundariesRequest cannot be nil").
+			AddContext("operation", "listBoundaries")
+	}
+	return nil
+}
+
+// ValidateGetBoundaryRequest validates a GetBoundaryRequest.
+func (v *RequestValidator) ValidateGetBoundaryRequest(request *eventstore.GetBoundaryRequest) error {
+	if request == nil {
+		return NewOrisunException("GetBoundaryRequest cannot be nil").
+			AddContext("operation", "getBoundary")
+	}
+	if strings.TrimSpace(request.Name) == "" {
+		return NewOrisunException("Boundary name is required").
+			AddContext("operation", "getBoundary")
+	}
+	return nil
+}
+
 // ValidateCreateUserRequest validates a CreateUserRequest
 func (v *RequestValidator) ValidateCreateUserRequest(request *eventstore.CreateUserRequest) error {
 	if request == nil {

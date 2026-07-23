@@ -192,6 +192,43 @@ Available options:
 
 The older `NewClientBuilder` API remains available for compatibility, but new code should prefer `New` with options.
 
+## Boundary Management
+
+Boundary definitions are durable admin commands. Create and import calls return
+the catalog entry in `PROVISIONING`; wait for `ACTIVE` before using the boundary
+with event-store APIs.
+
+```go
+placement := &eventstore.BoundaryPlacementInput{
+	Backend:   "postgres",
+	Namespace: "orders",
+}
+
+created, err := client.CreateBoundary(ctx, &eventstore.CreateBoundaryRequest{
+	Name:        "orders",
+	Description: "Order lifecycle events",
+	Placement:   placement,
+})
+if err != nil {
+	log.Fatal(err)
+}
+
+boundary := created.Boundary
+for boundary.Status == eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_PROVISIONING {
+	time.Sleep(100 * time.Millisecond)
+	response, err := client.GetBoundary(ctx, &eventstore.GetBoundaryRequest{Name: "orders"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	boundary = response.Boundary
+}
+
+catalog, err := client.ListBoundaries(ctx, &eventstore.ListBoundariesRequest{})
+```
+
+Use `ImportBoundary` instead when the physical boundary already exists. Both
+operations reject duplicate names with gRPC `ALREADY_EXISTS`.
+
 ## High-Throughput Writes
 
 Use one client per target and reuse it. The client caches Orisun auth tokens after the first authenticated response, so hot `SaveEvents` calls should use the cached token path rather than repeatedly sending Basic credentials.
@@ -243,10 +280,14 @@ To regenerate protobuf files from the `protos` submodule:
 
 ```bash
 git submodule update --init --recursive
-protoc --go_out=. --go_opt=paths=source_relative \
-  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-  protos/*.proto
-mv protos/*.go eventstore/
+protoc -I protos \
+  --go_out=eventstore --go_opt=paths=source_relative \
+  '--go_opt=Madmin.proto=github.com/oexza/orisun-client-go/eventstore;orisun' \
+  '--go_opt=Meventstore.proto=github.com/oexza/orisun-client-go/eventstore;orisun' \
+  --go-grpc_out=eventstore --go-grpc_opt=paths=source_relative \
+  '--go-grpc_opt=Madmin.proto=github.com/oexza/orisun-client-go/eventstore;orisun' \
+  '--go-grpc_opt=Meventstore.proto=github.com/oexza/orisun-client-go/eventstore;orisun' \
+  protos/eventstore.proto protos/admin.proto
 ```
 
 ## Test
