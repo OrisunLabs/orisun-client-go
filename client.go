@@ -724,7 +724,8 @@ func (c *OrisunClient) handleSubscribeException(err error, request any) error {
 		AddContext("statusDescription", st.Message())
 }
 
-// CreateBoundary records and provisions a new boundary.
+// CreateBoundary records a catalog definition and idempotently provisions its
+// physical storage.
 func (c *OrisunClient) CreateBoundary(ctx context.Context, request *eventstore.CreateBoundaryRequest) (*eventstore.CreateBoundaryResponse, error) {
 	validator := NewRequestValidator()
 	if err := validator.ValidateCreateBoundaryRequest(request); err != nil {
@@ -734,20 +735,6 @@ func (c *OrisunClient) CreateBoundary(ctx context.Context, request *eventstore.C
 	response, err := c.adminClient.CreateBoundary(ctx, request)
 	if err != nil {
 		return nil, c.handleAdminException(err, "createBoundary")
-	}
-	return response, nil
-}
-
-// ImportBoundary registers and provisions an existing physical boundary.
-func (c *OrisunClient) ImportBoundary(ctx context.Context, request *eventstore.ImportBoundaryRequest) (*eventstore.ImportBoundaryResponse, error) {
-	validator := NewRequestValidator()
-	if err := validator.ValidateImportBoundaryRequest(request); err != nil {
-		return nil, err
-	}
-
-	response, err := c.adminClient.ImportBoundary(ctx, request)
-	if err != nil {
-		return nil, c.handleAdminException(err, "importBoundary")
 	}
 	return response, nil
 }

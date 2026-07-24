@@ -42,13 +42,13 @@ func TestClient_BoundaryManagement_RoundTrip(t *testing.T) {
 		Name: "orders", Placement: placement,
 	})
 	require.NoError(t, err)
-	require.Equal(t, eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_CREATED, created.Boundary.Origin)
+	require.False(t, created.Boundary.ExistedBeforeCatalog)
 
-	imported, err := client.ImportBoundary(t.Context(), &eventstore.ImportBoundaryRequest{
-		Name: "legacy_orders", Placement: placement,
+	existing, err := client.CreateBoundary(t.Context(), &eventstore.CreateBoundaryRequest{
+		Name: "legacy_orders", Placement: placement, ExistedBeforeCatalog: true,
 	})
 	require.NoError(t, err)
-	require.Equal(t, eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_IMPORTED, imported.Boundary.Origin)
+	require.True(t, existing.Boundary.ExistedBeforeCatalog)
 
 	listed, err := client.ListBoundaries(t.Context(), &eventstore.ListBoundariesRequest{})
 	require.NoError(t, err)
@@ -70,19 +70,7 @@ func (boundaryAdminTestServer) CreateBoundary(
 	return &eventstore.CreateBoundaryResponse{Boundary: boundaryInfo(
 		request.Name,
 		request.Placement,
-		eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_CREATED,
-		eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_PROVISIONING,
-	)}, nil
-}
-
-func (boundaryAdminTestServer) ImportBoundary(
-	_ context.Context,
-	request *eventstore.ImportBoundaryRequest,
-) (*eventstore.ImportBoundaryResponse, error) {
-	return &eventstore.ImportBoundaryResponse{Boundary: boundaryInfo(
-		request.Name,
-		request.Placement,
-		eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_IMPORTED,
+		request.ExistedBeforeCatalog,
 		eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_PROVISIONING,
 	)}, nil
 }
@@ -96,13 +84,13 @@ func (boundaryAdminTestServer) ListBoundaries(
 		boundaryInfo(
 			"legacy_orders",
 			placement,
-			eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_IMPORTED,
+			true,
 			eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 		),
 		boundaryInfo(
 			"orders",
 			placement,
-			eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_CREATED,
+			false,
 			eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 		),
 	}}, nil
@@ -115,7 +103,7 @@ func (boundaryAdminTestServer) GetBoundary(
 	return &eventstore.GetBoundaryResponse{Boundary: boundaryInfo(
 		request.Name,
 		&eventstore.BoundaryPlacementInput{Backend: "postgres", Namespace: "orders"},
-		eventstore.BoundaryRegistrationOrigin_BOUNDARY_REGISTRATION_ORIGIN_CREATED,
+		false,
 		eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 	)}, nil
 }
@@ -123,13 +111,13 @@ func (boundaryAdminTestServer) GetBoundary(
 func boundaryInfo(
 	name string,
 	placement *eventstore.BoundaryPlacementInput,
-	origin eventstore.BoundaryRegistrationOrigin,
+	existedBeforeCatalog bool,
 	status eventstore.BoundaryLifecycleStatus,
 ) *eventstore.BoundaryInfo {
 	return &eventstore.BoundaryInfo{
-		Name:      name,
-		Placement: placement,
-		Origin:    origin,
-		Status:    status,
+		Name:                 name,
+		Placement:            placement,
+		ExistedBeforeCatalog: existedBeforeCatalog,
+		Status:               status,
 	}
 }

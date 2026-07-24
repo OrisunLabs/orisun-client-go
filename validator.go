@@ -176,19 +176,6 @@ func (v *RequestValidator) ValidateCreateBoundaryRequest(request *eventstore.Cre
 	)
 }
 
-// ValidateImportBoundaryRequest validates an ImportBoundaryRequest.
-func (v *RequestValidator) ValidateImportBoundaryRequest(request *eventstore.ImportBoundaryRequest) error {
-	if request == nil {
-		return NewOrisunException("ImportBoundaryRequest cannot be nil").
-			AddContext("operation", "importBoundary")
-	}
-	return v.validateBoundaryDefinition(
-		request.Name,
-		request.Placement,
-		"importBoundary",
-	)
-}
-
 func (v *RequestValidator) validateBoundaryDefinition(
 	name string,
 	placement *eventstore.BoundaryPlacementInput,

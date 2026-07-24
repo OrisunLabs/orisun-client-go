@@ -226,8 +226,9 @@ for boundary.Status == eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STA
 catalog, err := client.ListBoundaries(ctx, &eventstore.ListBoundariesRequest{})
 ```
 
-Use `ImportBoundary` instead when the physical boundary already exists. Both
-operations reject duplicate names with gRPC `ALREADY_EXISTS`.
+Set `ExistedBeforeCatalog: true` on `CreateBoundaryRequest` when the physical
+boundary already exists. Boundary names remain unique, so repeated creates are
+rejected with gRPC `ALREADY_EXISTS`.
 
 ## High-Throughput Writes
 

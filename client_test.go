@@ -861,9 +861,10 @@ func TestClient_BoundaryManagement_Validation(t *testing.T) {
 	})
 	require.ErrorContains(t, err, "Boundary placement is required")
 
-	_, err = client.ImportBoundary(context.Background(), &eventstore.ImportBoundaryRequest{
-		Name:      "orders",
-		Placement: &eventstore.BoundaryPlacementInput{Backend: "postgres"},
+	_, err = client.CreateBoundary(context.Background(), &eventstore.CreateBoundaryRequest{
+		Name:                 "orders",
+		Placement:            &eventstore.BoundaryPlacementInput{Backend: "postgres"},
+		ExistedBeforeCatalog: true,
 	})
 	require.ErrorContains(t, err, "Boundary placement namespace is required")
 
@@ -1034,9 +1035,6 @@ func TestRequestValidator_AdminRequests(t *testing.T) {
 		assert.NoError(t, validator.ValidateCreateBoundaryRequest(&eventstore.CreateBoundaryRequest{
 			Name: "orders", Placement: placement,
 		}))
-		assert.NoError(t, validator.ValidateImportBoundaryRequest(&eventstore.ImportBoundaryRequest{
-			Name: "orders", Placement: placement,
-		}))
 		assert.NoError(t, validator.ValidateListBoundariesRequest(&eventstore.ListBoundariesRequest{}))
 		assert.NoError(t, validator.ValidateGetBoundaryRequest(&eventstore.GetBoundaryRequest{Name: "orders"}))
 
@@ -1048,11 +1046,12 @@ func TestRequestValidator_AdminRequests(t *testing.T) {
 		})
 		assert.ErrorContains(t, err, "backend is required")
 
-		err = validator.ValidateImportBoundaryRequest(&eventstore.ImportBoundaryRequest{
+		err = validator.ValidateCreateBoundaryRequest(&eventstore.CreateBoundaryRequest{
 			Name: "orders",
 			Placement: &eventstore.BoundaryPlacementInput{
 				Backend: "postgres",
 			},
+			ExistedBeforeCatalog: true,
 		})
 		assert.ErrorContains(t, err, "namespace is required")
 	})
