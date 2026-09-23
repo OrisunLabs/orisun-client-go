@@ -621,6 +621,23 @@ func (c *OrisunClient) SaveEventsV2(ctx context.Context, request *eventstore.Sav
 	return response, nil
 }
 
+// GetWriteContext retrieves the observations checked atomically with a write.
+// Treat WriteId as opaque and scope it to the boundary that produced it.
+func (c *OrisunClient) GetWriteContext(ctx context.Context, request *eventstore.GetWriteContextRequest) (*eventstore.WriteContext, error) {
+	if request == nil || request.Boundary == "" || request.WriteId == "" {
+		return nil, NewOrisunException("Boundary and write ID are required").AddContext("operation", "getWriteContext")
+	}
+	response, err := c.client.GetWriteContext(ctx, request)
+	if err != nil {
+		return nil, NewOrisunExceptionWithCause("Failed to get write context", err).
+			AddContext("operation", "getWriteContext").
+			AddContext("boundary", request.Boundary).
+			AddContext("writeId", request.WriteId).
+			AddContext("statusCode", status.Code(err).String())
+	}
+	return response, nil
+}
+
 // GetEvents retrieves events from the event store
 func (c *OrisunClient) GetEvents(ctx context.Context, request *eventstore.GetEventsRequest) (*eventstore.GetEventsResponse, error) {
 	// Validate request
