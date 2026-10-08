@@ -368,8 +368,8 @@ func (b *ClientBuilder) createChannel(target string) (*grpc.ClientConn, error) {
 			grpc.MaxCallRecvMsgSize(b.maxReceiveMessageSize),
 			grpc.MaxCallSendMsgSize(b.maxSendMessageSize),
 		),
-		grpc.WithInitialWindowSize(int32(b.flowControlWindow)),
-		grpc.WithInitialConnWindowSize(int32(b.flowControlWindow)),
+		grpc.WithStaticStreamWindowSize(int32(b.flowControlWindow)),
+		grpc.WithStaticConnWindowSize(int32(b.flowControlWindow)),
 	}
 
 	// Set up load balancing configuration
