@@ -4,7 +4,7 @@
 // 	protoc        v6.32.0
 // source: admin.proto
 
-package orisun
+package grpcapi
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1059,17 +1059,16 @@ func (x *BoundaryPlacementInput) GetNamespace() string {
 }
 
 type BoundaryInfo struct {
-	state                protoimpl.MessageState  `protogen:"open.v1"`
-	Name                 string                  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description          string                  `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Placement            *BoundaryPlacementInput `protobuf:"bytes,3,opt,name=placement,proto3" json:"placement,omitempty"`
-	Status               BoundaryLifecycleStatus `protobuf:"varint,4,opt,name=status,proto3,enum=orisun.BoundaryLifecycleStatus" json:"status,omitempty"`
-	ExistedBeforeCatalog bool                    `protobuf:"varint,5,opt,name=existed_before_catalog,json=existedBeforeCatalog,proto3" json:"existed_before_catalog,omitempty"`
-	LastError            string                  `protobuf:"bytes,6,opt,name=last_error,json=lastError,proto3" json:"last_error,omitempty"`
-	DefinitionPosition   *Position               `protobuf:"bytes,7,opt,name=definition_position,json=definitionPosition,proto3" json:"definition_position,omitempty"`
-	StatusPosition       *Position               `protobuf:"bytes,8,opt,name=status_position,json=statusPosition,proto3" json:"status_position,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state              protoimpl.MessageState  `protogen:"open.v1"`
+	Name               string                  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description        string                  `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Placement          *BoundaryPlacementInput `protobuf:"bytes,3,opt,name=placement,proto3" json:"placement,omitempty"`
+	Status             BoundaryLifecycleStatus `protobuf:"varint,4,opt,name=status,proto3,enum=orisun.BoundaryLifecycleStatus" json:"status,omitempty"`
+	LastError          string                  `protobuf:"bytes,6,opt,name=last_error,json=lastError,proto3" json:"last_error,omitempty"`
+	DefinitionPosition *Position               `protobuf:"bytes,7,opt,name=definition_position,json=definitionPosition,proto3" json:"definition_position,omitempty"`
+	StatusPosition     *Position               `protobuf:"bytes,8,opt,name=status_position,json=statusPosition,proto3" json:"status_position,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *BoundaryInfo) Reset() {
@@ -1130,13 +1129,6 @@ func (x *BoundaryInfo) GetStatus() BoundaryLifecycleStatus {
 	return BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_UNSPECIFIED
 }
 
-func (x *BoundaryInfo) GetExistedBeforeCatalog() bool {
-	if x != nil {
-		return x.ExistedBeforeCatalog
-	}
-	return false
-}
-
 func (x *BoundaryInfo) GetLastError() string {
 	if x != nil {
 		return x.LastError
@@ -1159,14 +1151,12 @@ func (x *BoundaryInfo) GetStatusPosition() *Position {
 }
 
 type CreateBoundaryRequest struct {
-	state       protoimpl.MessageState  `protogen:"open.v1"`
-	Name        string                  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description string                  `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Placement   *BoundaryPlacementInput `protobuf:"bytes,3,opt,name=placement,proto3" json:"placement,omitempty"`
-	// Set when adopting physical storage that predates the catalog definition.
-	ExistedBeforeCatalog bool `protobuf:"varint,4,opt,name=existed_before_catalog,json=existedBeforeCatalog,proto3" json:"existed_before_catalog,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Name          string                  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                  `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Placement     *BoundaryPlacementInput `protobuf:"bytes,3,opt,name=placement,proto3" json:"placement,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateBoundaryRequest) Reset() {
@@ -1218,13 +1208,6 @@ func (x *CreateBoundaryRequest) GetPlacement() *BoundaryPlacementInput {
 		return x.Placement
 	}
 	return nil
-}
-
-func (x *CreateBoundaryRequest) GetExistedBeforeCatalog() bool {
-	if x != nil {
-		return x.ExistedBeforeCatalog
-	}
-	return false
 }
 
 type CreateBoundaryResponse struct {
@@ -1499,22 +1482,20 @@ const file_admin_proto_rawDesc = "" +
 	"\x05count\x18\x01 \x01(\x03R\x05count\"P\n" +
 	"\x16BoundaryPlacementInput\x12\x18\n" +
 	"\abackend\x18\x01 \x01(\tR\abackend\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"\x8e\x03\n" +
+	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"\xd8\x02\n" +
 	"\fBoundaryInfo\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12<\n" +
 	"\tplacement\x18\x03 \x01(\v2\x1e.orisun.BoundaryPlacementInputR\tplacement\x127\n" +
-	"\x06status\x18\x04 \x01(\x0e2\x1f.orisun.BoundaryLifecycleStatusR\x06status\x124\n" +
-	"\x16existed_before_catalog\x18\x05 \x01(\bR\x14existedBeforeCatalog\x12\x1d\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x1f.orisun.BoundaryLifecycleStatusR\x06status\x12\x1d\n" +
 	"\n" +
 	"last_error\x18\x06 \x01(\tR\tlastError\x12A\n" +
 	"\x13definition_position\x18\a \x01(\v2\x10.orisun.PositionR\x12definitionPosition\x129\n" +
-	"\x0fstatus_position\x18\b \x01(\v2\x10.orisun.PositionR\x0estatusPosition\"\xc1\x01\n" +
+	"\x0fstatus_position\x18\b \x01(\v2\x10.orisun.PositionR\x0estatusPosition\"\x8b\x01\n" +
 	"\x15CreateBoundaryRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12<\n" +
-	"\tplacement\x18\x03 \x01(\v2\x1e.orisun.BoundaryPlacementInputR\tplacement\x124\n" +
-	"\x16existed_before_catalog\x18\x04 \x01(\bR\x14existedBeforeCatalog\"J\n" +
+	"\tplacement\x18\x03 \x01(\v2\x1e.orisun.BoundaryPlacementInputR\tplacement\"J\n" +
 	"\x16CreateBoundaryResponse\x120\n" +
 	"\bboundary\x18\x01 \x01(\v2\x14.orisun.BoundaryInfoR\bboundary\"\x17\n" +
 	"\x15ListBoundariesRequest\"N\n" +

@@ -19,6 +19,7 @@ import (
 type writeContextTestServer struct {
 	eventstore.UnimplementedEventStoreServer
 	context *eventstore.WriteContext
+	onSave  func(*eventstore.SaveEventsV2Request)
 }
 
 func (s writeContextTestServer) GetWriteContext(_ context.Context, req *eventstore.GetWriteContextRequest) (*eventstore.WriteContext, error) {
@@ -29,6 +30,9 @@ func (s writeContextTestServer) GetWriteContext(_ context.Context, req *eventsto
 }
 
 func (s writeContextTestServer) SaveEventsV2(_ context.Context, req *eventstore.SaveEventsV2Request) (*eventstore.WriteResult, error) {
+	if s.onSave != nil {
+		s.onSave(req)
+	}
 	return &eventstore.WriteResult{WriteId: s.context.WriteId, LogPosition: req.Consistency[0].Position}, nil
 }
 
@@ -65,4 +69,29 @@ func TestWriteContextRoundTrip(t *testing.T) {
 		_, err = client.GetWriteContext(t.Context(), req)
 		require.Error(t, err)
 	}
+}
+
+func TestSingleQuerySaveUsesCanonicalRPC(t *testing.T) {
+	query := &eventstore.Query{Criteria: []*eventstore.Criterion{{Tags: []*eventstore.Tag{{Key: "orderId", Value: "one"}}}}}
+	want := &eventstore.WriteContext{WriteId: "11:7"}
+	listener := bufconn.Listen(1024 * 1024)
+	server := grpc.NewServer()
+	captured := make(chan *eventstore.SaveEventsV2Request, 1)
+	eventstore.RegisterEventStoreServer(server, writeContextTestServer{context: want, onSave: func(req *eventstore.SaveEventsV2Request) { captured <- req }})
+	go func() { _ = server.Serve(listener) }()
+	t.Cleanup(server.Stop)
+	conn, err := grpc.NewClient("passthrough:///bufnet", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) { return listener.Dial() }))
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = conn.Close() })
+	client := &OrisunClient{conn: conn, client: eventstore.NewEventStoreClient(conn), logger: NewDefaultLogger(ERROR)}
+	saved, err := client.SaveEvents(t.Context(), &eventstore.SaveEventsRequest{Boundary: "orders", Events: []*eventstore.EventToSave{{EventId: "one", EventType: "Created", Data: `{}`}}, Query: &eventstore.SaveQuery{SubsetQuery: query}})
+	require.NoError(t, err)
+	require.Equal(t, want.WriteId, saved.WriteId)
+	require.EqualValues(t, -1, saved.LogPosition.CommitPosition)
+	require.EqualValues(t, -1, saved.LogPosition.PreparePosition)
+	request := <-captured
+	require.Equal(t, "orders", request.Boundary)
+	require.Len(t, request.Events, 1)
+	require.Len(t, request.Consistency, 1)
+	require.True(t, proto.Equal(query, request.Consistency[0].Query))
 }

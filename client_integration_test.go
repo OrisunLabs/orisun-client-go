@@ -67,15 +67,11 @@ func TestClientIntegration_SaveAndGetEvents(t *testing.T) {
 	defer cancel()
 
 	// Save an event
-	saveRequest := &eventstore.SaveEventsRequest{
-		Boundary: "orisun_test_1",
-		Query: &eventstore.Query{
-			ExpectedPosition: &eventstore.ExpectedPosition{
-				TransactionId: -1,
-				GlobalId:      -1,
-			},
-		},
-		Events: []*eventstore.EventToSave{
+	saveRequest := &eventstore.SaveEventsV2Request{
+		Boundary: "orisun_test_1", Consistency: []*eventstore.ConsistencyObservation{{Position: &eventstore.ExpectedPosition{
+			TransactionId: -1,
+			GlobalId:      -1,
+		}}}, Events: []*eventstore.EventToSave{
 			{
 				EventId:   "integration-test-001",
 				EventType: "TestEvent",
@@ -85,7 +81,7 @@ func TestClientIntegration_SaveAndGetEvents(t *testing.T) {
 		},
 	}
 
-	result, err := client.SaveEvents(ctx, saveRequest)
+	result, err := client.SaveEventsV2(ctx, saveRequest)
 	require.NoError(t, err, "SaveEvents should succeed")
 	require.NotNil(t, result)
 

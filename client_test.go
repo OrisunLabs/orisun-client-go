@@ -720,7 +720,7 @@ func TestClient_SaveEvents_EventIDIsApplicationDefined(t *testing.T) {
 	require.NotNil(t, client)
 	defer client.Close()
 
-	request := &eventstore.SaveEventsRequest{
+	request := &eventstore.SaveEventsV2Request{
 		Boundary: "test-boundary",
 		Events: []*eventstore.EventToSave{
 			{
@@ -731,7 +731,7 @@ func TestClient_SaveEvents_EventIDIsApplicationDefined(t *testing.T) {
 		},
 	}
 
-	_, err = client.SaveEvents(context.Background(), request)
+	_, err = client.SaveEventsV2(context.Background(), request)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Failed to save events")
 }
@@ -916,9 +916,8 @@ func TestClient_BoundaryManagement_Validation(t *testing.T) {
 	require.ErrorContains(t, err, "Boundary placement is required")
 
 	_, err = client.CreateBoundary(context.Background(), &eventstore.CreateBoundaryRequest{
-		Name:                 "orders",
-		Placement:            &eventstore.BoundaryPlacementInput{Backend: "postgres"},
-		ExistedBeforeCatalog: true,
+		Name:      "orders",
+		Placement: &eventstore.BoundaryPlacementInput{Backend: "postgres"},
 	})
 	require.ErrorContains(t, err, "Boundary placement namespace is required")
 
@@ -1105,7 +1104,6 @@ func TestRequestValidator_AdminRequests(t *testing.T) {
 			Placement: &eventstore.BoundaryPlacementInput{
 				Backend: "postgres",
 			},
-			ExistedBeforeCatalog: true,
 		})
 		assert.ErrorContains(t, err, "namespace is required")
 	})

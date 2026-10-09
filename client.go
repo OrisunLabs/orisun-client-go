@@ -577,29 +577,24 @@ func (c *OrisunClient) HealthCheck(ctx context.Context, boundary string) (bool, 
 	return true, nil
 }
 
-// SaveEvents saves events to a boundary.
-//
-// Deprecated: use SaveEventsV2.
+// Validate request
+
+// Make the gRPC call
+
+// SaveEvents appends a batch with an optional single-query consistency condition.
 func (c *OrisunClient) SaveEvents(ctx context.Context, request *eventstore.SaveEventsRequest) (*eventstore.WriteResult, error) {
-	// Validate request
-	validator := NewRequestValidator()
-	if err := validator.ValidateSaveEventsRequest(request); err != nil {
+	if err := NewRequestValidator().ValidateSaveEventsRequest(request); err != nil {
 		return nil, err
 	}
-
-	c.logger.Debug("Saving {} in boundary '{}'",
-		len(request.Events), request.Boundary)
-
-	// Make the gRPC call
-	response, err := c.client.SaveEvents(ctx, request)
-	if err != nil {
-		return nil, c.handleSaveException(err, "saveEvents")
+	save := &eventstore.SaveEventsV2Request{Boundary: request.Boundary, Events: request.Events}
+	if request.Query != nil && request.Query.SubsetQuery != nil && len(request.Query.SubsetQuery.Criteria) > 0 {
+		position := request.Query.ExpectedPosition
+		if position == nil {
+			position = &eventstore.Position{CommitPosition: -1, PreparePosition: -1}
+		}
+		save.Consistency = []*eventstore.ConsistencyObservation{{Query: request.Query.SubsetQuery, Position: position}}
 	}
-
-	c.logger.Info("Successfully saved {} events ",
-		len(request.Events))
-
-	return response, nil
+	return c.SaveEventsV2(ctx, save)
 }
 
 // SaveEventsV2 saves events after atomically validating every consistency observation.

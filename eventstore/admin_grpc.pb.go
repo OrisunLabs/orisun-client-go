@@ -4,7 +4,7 @@
 // - protoc             v6.32.0
 // source: admin.proto
 
-package orisun
+package grpcapi
 
 import (
 	context "context"

@@ -16,13 +16,11 @@ func NewRequestValidator() *RequestValidator {
 	return &RequestValidator{}
 }
 
-// ValidateSaveEventsRequest validates a SaveEventsRequest
+// ValidateSaveEventsRequest validates the single-query client convenience request.
 func (v *RequestValidator) ValidateSaveEventsRequest(request *eventstore.SaveEventsRequest) error {
 	if request == nil {
-		return NewOrisunException("SaveEventsRequest cannot be nil").
-			AddContext("operation", "saveEvents")
+		return NewOrisunException("SaveEventsRequest cannot be nil").AddContext("operation", "saveEvents")
 	}
-
 	return v.validateSaveRequest(request.Boundary, request.Events, "saveEvents", "SaveEventsRequest")
 }
 

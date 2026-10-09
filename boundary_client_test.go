@@ -42,13 +42,13 @@ func TestClient_BoundaryManagement_RoundTrip(t *testing.T) {
 		Name: "orders", Placement: placement,
 	})
 	require.NoError(t, err)
-	require.False(t, created.Boundary.ExistedBeforeCatalog)
+	require.Equal(t, "orders", created.Boundary.Name)
 
 	existing, err := client.CreateBoundary(t.Context(), &eventstore.CreateBoundaryRequest{
-		Name: "legacy_orders", Placement: placement, ExistedBeforeCatalog: true,
+		Name: "legacy_orders", Placement: placement,
 	})
 	require.NoError(t, err)
-	require.True(t, existing.Boundary.ExistedBeforeCatalog)
+	require.Equal(t, "legacy_orders", existing.Boundary.Name)
 
 	listed, err := client.ListBoundaries(t.Context(), &eventstore.ListBoundariesRequest{})
 	require.NoError(t, err)
@@ -70,7 +70,6 @@ func (boundaryAdminTestServer) CreateBoundary(
 	return &eventstore.CreateBoundaryResponse{Boundary: boundaryInfo(
 		request.Name,
 		request.Placement,
-		request.ExistedBeforeCatalog,
 		eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_PROVISIONING,
 	)}, nil
 }
@@ -84,13 +83,13 @@ func (boundaryAdminTestServer) ListBoundaries(
 		boundaryInfo(
 			"legacy_orders",
 			placement,
-			true,
+
 			eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 		),
 		boundaryInfo(
 			"orders",
 			placement,
-			false,
+
 			eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 		),
 	}}, nil
@@ -103,7 +102,7 @@ func (boundaryAdminTestServer) GetBoundary(
 	return &eventstore.GetBoundaryResponse{Boundary: boundaryInfo(
 		request.Name,
 		&eventstore.BoundaryPlacementInput{Backend: "postgres", Namespace: "orders"},
-		false,
+
 		eventstore.BoundaryLifecycleStatus_BOUNDARY_LIFECYCLE_STATUS_ACTIVE,
 	)}, nil
 }
@@ -111,13 +110,12 @@ func (boundaryAdminTestServer) GetBoundary(
 func boundaryInfo(
 	name string,
 	placement *eventstore.BoundaryPlacementInput,
-	existedBeforeCatalog bool,
 	status eventstore.BoundaryLifecycleStatus,
 ) *eventstore.BoundaryInfo {
 	return &eventstore.BoundaryInfo{
-		Name:                 name,
-		Placement:            placement,
-		ExistedBeforeCatalog: existedBeforeCatalog,
-		Status:               status,
+		Name:      name,
+		Placement: placement,
+
+		Status: status,
 	}
 }
